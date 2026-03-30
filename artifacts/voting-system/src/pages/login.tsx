@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Card } from "@/components/ui/card";
@@ -11,11 +11,11 @@ import {
   ShieldAlert,
   ArrowRight,
   CheckCircle2,
-  Camera,
   ScanFace,
   Vote,
   Loader2,
   AlertCircle,
+  Camera,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -47,11 +47,7 @@ function StepIndicator({ current }: { current: Step }) {
                     : "bg-muted text-muted-foreground"
                 }`}
               >
-                {done ? (
-                  <CheckCircle2 className="h-5 w-5" />
-                ) : (
-                  <Icon className="h-5 w-5" />
-                )}
+                {done ? <CheckCircle2 className="h-5 w-5" /> : <Icon className="h-5 w-5" />}
               </div>
               <span
                 className={`text-xs font-medium ${
@@ -75,17 +71,11 @@ function StepIndicator({ current }: { current: Step }) {
   );
 }
 
-function ScanAnimation({ color = "primary" }: { color?: string }) {
+function PulseRing() {
   return (
-    <div className="relative flex items-center justify-center">
-      <div
-        className={`absolute inset-0 rounded-full bg-${color}/10 animate-ping`}
-        style={{ animationDuration: "1.4s" }}
-      />
-      <div
-        className={`absolute inset-2 rounded-full bg-${color}/10 animate-ping`}
-        style={{ animationDuration: "1.4s", animationDelay: "0.3s" }}
-      />
+    <div className="absolute inset-0 pointer-events-none">
+      <div className="absolute inset-0 rounded-full bg-primary/10 animate-ping" style={{ animationDuration: "1.4s" }} />
+      <div className="absolute inset-2 rounded-full bg-primary/10 animate-ping" style={{ animationDuration: "1.4s", animationDelay: "0.3s" }} />
     </div>
   );
 }
@@ -94,21 +84,21 @@ export default function Login() {
   const [step, setStep] = useState<Step>(1);
   const [aadhar, setAadhar] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
-  const [faceStatus, setFaceStatus] = useState<"idle" | "scanning" | "done">("idle");
-  const [fingerprintStatus, setFingerprintStatus] = useState<"idle" | "scanning" | "done">("idle");
-  const [faceProgress, setFaceProgress] = useState(0);
-  const [fpProgress, setFpProgress] = useState(0);
   const [loginError, setLoginError] = useState<string | null>(null);
-  const { login, isLoggingIn, user } = useAuth();
+
+  const [faceStatus, setFaceStatus] = useState<"idle" | "scanning" | "done">("idle");
+  const [faceProgress, setFaceProgress] = useState(0);
+
+  const [fpStatus, setFpStatus] = useState<"idle" | "scanning" | "done">("idle");
+  const [fpProgress, setFpProgress] = useState(0);
+
+  // loggedInUser is captured at step-1 success and used only at step-4
+  const [loggedInUser, setLoggedInUser] = useState<{ isAdmin: boolean; name: string } | null>(null);
+
+  const { login, isLoggingIn } = useAuth();
   const [, setLocation] = useLocation();
 
-  useEffect(() => {
-    if (user) {
-      setLocation(user.isAdmin ? "/admin" : "/vote");
-    }
-  }, [user, setLocation]);
-
-  // Step 1: Verify Aadhar
+  /* ── Step 1: verify Aadhar via API ── */
   const handleAadharSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (aadhar.length !== 12) return;
@@ -116,22 +106,28 @@ export default function Login() {
     login(
       { data: { aadharNumber: aadhar, isAdmin } },
       {
-        onSuccess: () => setStep(2),
+        onSuccess: (data: any) => {
+          // Save user info locally; do NOT redirect yet
+          setLoggedInUser({ isAdmin: data.voter.isAdmin, name: data.voter.name });
+          setStep(2);
+        },
         onError: (err: any) => {
-          setLoginError(err?.message || "Aadhar number not found. Please contact admin.");
+          setLoginError(
+            err?.error || err?.message || "Aadhar number not registered. Please contact admin."
+          );
         },
       }
     );
   };
 
-  // Step 2: Face scan simulation
+  /* ── Step 2: simulated face scan ── */
   const startFaceScan = () => {
     setFaceStatus("scanning");
     setFaceProgress(0);
-    const interval = setInterval(() => {
+    const iv = setInterval(() => {
       setFaceProgress((p) => {
         if (p >= 100) {
-          clearInterval(interval);
+          clearInterval(iv);
           setFaceStatus("done");
           setTimeout(() => setStep(3), 600);
           return 100;
@@ -141,15 +137,15 @@ export default function Login() {
     }, 80);
   };
 
-  // Step 3: Fingerprint simulation
-  const startFingerprintScan = () => {
-    setFingerprintStatus("scanning");
+  /* ── Step 3: simulated fingerprint ── */
+  const startFpScan = () => {
+    setFpStatus("scanning");
     setFpProgress(0);
-    const interval = setInterval(() => {
+    const iv = setInterval(() => {
       setFpProgress((p) => {
         if (p >= 100) {
-          clearInterval(interval);
-          setFingerprintStatus("done");
+          clearInterval(iv);
+          setFpStatus("done");
           setTimeout(() => setStep(4), 600);
           return 100;
         }
@@ -158,17 +154,16 @@ export default function Login() {
     }, 80);
   };
 
+  /* ── Step 4: proceed ── */
   const handleGoVote = () => {
-    if (user) {
-      setLocation(user.isAdmin ? "/admin" : "/vote");
-    }
+    setLocation(loggedInUser?.isAdmin ? "/admin" : "/vote");
   };
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center -mt-8">
       <div className="w-full max-w-5xl grid lg:grid-cols-2 gap-12 items-center">
 
-        {/* Left: Multi-step form */}
+        {/* ── Left: form ── */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -184,7 +179,7 @@ export default function Login() {
               Secure Voting Gateway
             </h1>
             <p className="text-muted-foreground">
-              Multi-factor identity verification to ensure a fair and secure election.
+              Three-factor identity verification for a fair and secure election.
             </p>
           </div>
 
@@ -193,10 +188,10 @@ export default function Login() {
 
             <AnimatePresence mode="wait">
 
-              {/* ── Step 1: Aadhar ── */}
+              {/* ── STEP 1: Aadhar ── */}
               {step === 1 && (
                 <motion.div
-                  key="step1"
+                  key="s1"
                   initial={{ opacity: 0, x: 30 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -30 }}
@@ -208,9 +203,7 @@ export default function Login() {
                   </p>
                   <form onSubmit={handleAadharSubmit} className="space-y-5">
                     <div className="space-y-2">
-                      <Label htmlFor="aadhar" className="font-semibold">
-                        Aadhar Number
-                      </Label>
+                      <Label htmlFor="aadhar" className="font-semibold">Aadhar Number</Label>
                       <div className="relative">
                         <Fingerprint className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground h-5 w-5" />
                         <Input
@@ -271,10 +264,10 @@ export default function Login() {
                 </motion.div>
               )}
 
-              {/* ── Step 2: Face Verification ── */}
+              {/* ── STEP 2: Face scan ── */}
               {step === 2 && (
                 <motion.div
-                  key="step2"
+                  key="s2"
                   initial={{ opacity: 0, x: 30 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -30 }}
@@ -283,29 +276,22 @@ export default function Login() {
                 >
                   <h2 className="text-lg font-semibold mb-1">Step 2: Face Verification</h2>
                   <p className="text-sm text-muted-foreground mb-6">
-                    Look directly at the camera. Hold still while we scan your face.
+                    Look directly at the camera and hold still while we scan your face.
                   </p>
 
                   <div className="relative w-48 h-48 mb-6">
-                    {/* Face frame */}
                     <div className="absolute inset-0 rounded-full border-4 border-dashed border-primary/30 flex items-center justify-center">
                       <div className="w-36 h-36 rounded-full bg-muted/60 flex items-center justify-center overflow-hidden">
                         <ScanFace
                           className={`h-20 w-20 transition-colors duration-300 ${
-                            faceStatus === "done"
-                              ? "text-green-500"
-                              : faceStatus === "scanning"
-                              ? "text-primary animate-pulse"
-                              : "text-muted-foreground"
+                            faceStatus === "done" ? "text-green-500"
+                            : faceStatus === "scanning" ? "text-primary animate-pulse"
+                            : "text-muted-foreground"
                           }`}
                         />
                       </div>
                     </div>
-                    {faceStatus === "scanning" && (
-                      <div className="absolute inset-0">
-                        <ScanAnimation color="primary" />
-                      </div>
-                    )}
+                    {faceStatus === "scanning" && <PulseRing />}
                     {faceStatus === "done" && (
                       <div className="absolute -bottom-1 -right-1 bg-green-500 rounded-full p-1.5">
                         <CheckCircle2 className="h-5 w-5 text-white" />
@@ -320,10 +306,9 @@ export default function Login() {
                         <span>{faceProgress}%</span>
                       </div>
                       <div className="h-2 rounded-full bg-muted overflow-hidden">
-                        <motion.div
-                          className={`h-full rounded-full ${faceStatus === "done" ? "bg-green-500" : "bg-primary"}`}
+                        <div
+                          className={`h-full rounded-full transition-all ${faceStatus === "done" ? "bg-green-500" : "bg-primary"}`}
                           style={{ width: `${faceProgress}%` }}
-                          transition={{ duration: 0.1 }}
                         />
                       </div>
                     </div>
@@ -339,7 +324,6 @@ export default function Login() {
                       </span>
                     </Button>
                   )}
-
                   {faceStatus === "scanning" && (
                     <Button disabled className="w-full h-12 text-base font-semibold rounded-xl">
                       <Loader2 className="h-4 w-4 animate-spin mr-2" /> Scanning Face...
@@ -348,10 +332,10 @@ export default function Login() {
                 </motion.div>
               )}
 
-              {/* ── Step 3: Fingerprint ── */}
+              {/* ── STEP 3: Fingerprint ── */}
               {step === 3 && (
                 <motion.div
-                  key="step3"
+                  key="s3"
                   initial={{ opacity: 0, x: 30 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -30 }}
@@ -368,66 +352,48 @@ export default function Login() {
                       <div className="w-36 h-36 rounded-xl bg-muted/60 flex items-center justify-center">
                         <Fingerprint
                           className={`h-24 w-24 transition-colors duration-300 ${
-                            fingerprintStatus === "done"
-                              ? "text-green-500"
-                              : fingerprintStatus === "scanning"
-                              ? "text-primary"
-                              : "text-muted-foreground"
+                            fpStatus === "done" ? "text-green-500"
+                            : fpStatus === "scanning" ? "text-primary"
+                            : "text-muted-foreground"
                           }`}
-                          style={
-                            fingerprintStatus === "scanning"
-                              ? {
-                                  filter: `drop-shadow(0 0 ${fpProgress / 10}px hsl(var(--primary)))`,
-                                }
-                              : {}
-                          }
+                          style={fpStatus === "scanning" ? { filter: `drop-shadow(0 0 ${fpProgress / 10}px hsl(var(--primary)))` } : {}}
                         />
                       </div>
                     </div>
-                    {fingerprintStatus === "scanning" && (
-                      <div className="absolute inset-0">
-                        <ScanAnimation color="primary" />
-                      </div>
-                    )}
-                    {fingerprintStatus === "done" && (
+                    {fpStatus === "scanning" && <PulseRing />}
+                    {fpStatus === "done" && (
                       <div className="absolute -bottom-1 -right-1 bg-green-500 rounded-full p-1.5">
                         <CheckCircle2 className="h-5 w-5 text-white" />
                       </div>
                     )}
                   </div>
 
-                  {fingerprintStatus !== "idle" && (
+                  {fpStatus !== "idle" && (
                     <div className="w-full mb-4">
                       <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                        <span>
-                          {fingerprintStatus === "done" ? "Fingerprint matched!" : "Reading fingerprint..."}
-                        </span>
+                        <span>{fpStatus === "done" ? "Fingerprint matched!" : "Reading fingerprint..."}</span>
                         <span>{fpProgress}%</span>
                       </div>
                       <div className="h-2 rounded-full bg-muted overflow-hidden">
-                        <motion.div
-                          className={`h-full rounded-full ${
-                            fingerprintStatus === "done" ? "bg-green-500" : "bg-primary"
-                          }`}
+                        <div
+                          className={`h-full rounded-full transition-all ${fpStatus === "done" ? "bg-green-500" : "bg-primary"}`}
                           style={{ width: `${fpProgress}%` }}
-                          transition={{ duration: 0.1 }}
                         />
                       </div>
                     </div>
                   )}
 
-                  {fingerprintStatus === "idle" && (
+                  {fpStatus === "idle" && (
                     <Button
                       className="w-full h-12 text-base font-semibold rounded-xl bg-gradient-to-r from-primary to-[#0f3b75] hover:opacity-90 shadow-lg shadow-primary/25"
-                      onClick={startFingerprintScan}
+                      onClick={startFpScan}
                     >
                       <span className="flex items-center gap-2">
                         <Fingerprint className="h-4 w-4" /> Scan Fingerprint
                       </span>
                     </Button>
                   )}
-
-                  {fingerprintStatus === "scanning" && (
+                  {fpStatus === "scanning" && (
                     <Button disabled className="w-full h-12 text-base font-semibold rounded-xl">
                       <Loader2 className="h-4 w-4 animate-spin mr-2" /> Reading Fingerprint...
                     </Button>
@@ -435,13 +401,12 @@ export default function Login() {
                 </motion.div>
               )}
 
-              {/* ── Step 4: Success ── */}
+              {/* ── STEP 4: All done ── */}
               {step === 4 && (
                 <motion.div
-                  key="step4"
+                  key="s4"
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
                   className="flex flex-col items-center text-center"
                 >
@@ -455,27 +420,16 @@ export default function Login() {
                   </motion.div>
 
                   <h2 className="text-xl font-bold text-green-700 mb-1">Identity Verified!</h2>
-                  <p className="text-sm text-muted-foreground mb-2">
-                    All checks passed successfully.
-                  </p>
-                  {user && (
-                    <p className="text-sm font-semibold text-foreground mb-6">
-                      Welcome, {user.name}
-                    </p>
+                  <p className="text-sm text-muted-foreground mb-1">All checks passed successfully.</p>
+                  {loggedInUser && (
+                    <p className="text-sm font-semibold text-foreground mb-6">Welcome, {loggedInUser.name}</p>
                   )}
 
                   <div className="w-full space-y-2 mb-6 text-left">
-                    {[
-                      { label: "Aadhar Verification", ok: true },
-                      { label: "Face Recognition", ok: true },
-                      { label: "Fingerprint Scan", ok: true },
-                    ].map((item) => (
-                      <div
-                        key={item.label}
-                        className="flex items-center gap-3 p-2.5 rounded-lg bg-green-50 border border-green-200"
-                      >
+                    {["Aadhar Verification", "Face Recognition", "Fingerprint Scan"].map((label) => (
+                      <div key={label} className="flex items-center gap-3 p-2.5 rounded-lg bg-green-50 border border-green-200">
                         <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
-                        <span className="text-sm font-medium text-green-800">{item.label}</span>
+                        <span className="text-sm font-medium text-green-800">{label}</span>
                       </div>
                     ))}
                   </div>
@@ -486,7 +440,7 @@ export default function Login() {
                   >
                     <span className="flex items-center gap-2">
                       <Vote className="h-4 w-4" />
-                      {user?.isAdmin ? "Go to Admin Panel" : "Proceed to Vote"}
+                      {loggedInUser?.isAdmin ? "Go to Admin Panel" : "Proceed to Vote"}
                     </span>
                   </Button>
                 </motion.div>
@@ -496,7 +450,7 @@ export default function Login() {
           </Card>
         </motion.div>
 
-        {/* Right: Visual */}
+        {/* ── Right: hero image ── */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -506,7 +460,7 @@ export default function Login() {
           <div className="absolute inset-0 bg-primary/20 mix-blend-multiply z-10 rounded-3xl" />
           <img
             src={`${import.meta.env.BASE_URL}images/civic-hero.png`}
-            alt="Civic Voting Background"
+            alt="Civic Voting"
             className="absolute inset-0 w-full h-full object-cover rounded-3xl"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/20 to-transparent z-20" />
