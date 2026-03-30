@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 
 import { Layout } from "@/components/layout";
 import Login from "@/pages/login";
+import Verify from "@/pages/verify";
 import Vote from "@/pages/vote";
 import Admin from "@/pages/admin";
 import Results from "@/pages/results";
@@ -42,6 +43,7 @@ function Router() {
     <Layout>
       <Switch>
         <Route path="/" component={Login} />
+        <Route path="/verify" component={Verify} />
         <Route path="/vote" component={Vote} />
         <Route path="/admin" component={Admin} />
         <Route path="/results" component={Results} />

@@ -10,8 +10,79 @@ import { Checkbox } from "@/components/ui/checkbox";
 import {
   Users, UserPlus, Flag, Trash2, Fingerprint, ScanFace,
   CheckCircle2, ArrowRight, Loader2, Camera, ArrowLeft,
+  ShieldAlert, AlertCircle, Lock,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+
+/* ─── Admin Login Gate ─── */
+function AdminLoginGate() {
+  const { login, isLoggingIn } = useAuth();
+  const [aadhar, setAadhar] = useState("");
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (aadhar.length !== 12) return;
+    setError(null);
+    login(
+      { data: { aadharNumber: aadhar, isAdmin: true } },
+      {
+        onError: (err: any) => {
+          setError(err?.error || "Invalid admin credentials. Make sure this Aadhar belongs to an admin account.");
+        },
+      }
+    );
+  };
+
+  return (
+    <div className="min-h-[70vh] flex items-center justify-center">
+      <div className="w-full max-w-sm">
+        <div className="text-center mb-6">
+          <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+            <Lock className="h-8 w-8 text-primary" />
+          </div>
+          <h1 className="text-2xl font-serif font-bold mb-1">Admin Access</h1>
+          <p className="text-sm text-muted-foreground">Enter your admin Aadhar number to continue.</p>
+        </div>
+        <Card className="p-7 shadow-xl shadow-primary/5">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-1.5">
+              <Label className="font-semibold text-sm">Admin Aadhar Number</Label>
+              <div className="relative">
+                <Fingerprint className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                <Input
+                  className="pl-9 h-11"
+                  inputMode="numeric"
+                  maxLength={12}
+                  placeholder="12-digit Aadhar"
+                  value={aadhar}
+                  onChange={(e) => { setError(null); setAadhar(e.target.value.replace(/[^0-9]/g, "")); }}
+                  required
+                />
+              </div>
+            </div>
+            {error && (
+              <div className="flex items-start gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-xl text-xs text-destructive">
+                <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+                {error}
+              </div>
+            )}
+            <Button
+              type="submit"
+              className="w-full h-11 font-semibold rounded-xl bg-gradient-to-r from-primary to-[#0f3b75] hover:opacity-90"
+              disabled={aadhar.length !== 12 || isLoggingIn}
+            >
+              {isLoggingIn ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Verifying...</> : <><ShieldAlert className="h-4 w-4 mr-2" />Access Admin Panel</>}
+            </Button>
+          </form>
+          <p className="text-[11px] text-center text-muted-foreground mt-4">
+            Admin Aadhar: <span className="font-mono">123456789012</span> (demo)
+          </p>
+        </Card>
+      </div>
+    </div>
+  );
+}
 
 /* ─── Shared biometric sub-components ─── */
 
@@ -285,8 +356,8 @@ export default function Admin() {
   const [candSymbol, setCandSymbol] = useState("");
 
   if (isAuthLoading) return <div className="flex justify-center py-20"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" /></div>;
-  if (!user) return <Redirect to="/" />;
-  if (!user.isAdmin) return <Redirect to="/vote" />;
+  if (!user) return <AdminLoginGate />;
+  if (!user.isAdmin) return <AdminLoginGate />;
 
   const handleAddCandidate = (e: React.FormEvent) => {
     e.preventDefault();
