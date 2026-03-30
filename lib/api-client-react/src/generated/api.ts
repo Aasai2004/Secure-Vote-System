@@ -26,6 +26,7 @@ import type {
   LoginRequest,
   LoginResponse,
   MessageResponse,
+  VoteRecord,
   Voter,
   VotingResults,
 } from "./api.schemas";
@@ -977,6 +978,81 @@ export function useGetResults<
   request?: SecondParameter<typeof customFetch>;
 }): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
   const queryOptions = getGetResultsQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Get detailed vote records (admin only)
+ */
+export const getGetVoteDetailsUrl = () => {
+  return `/api/admin/vote-details`;
+};
+
+export const getVoteDetails = async (
+  options?: RequestInit,
+): Promise<VoteRecord[]> => {
+  return customFetch<VoteRecord[]>(getGetVoteDetailsUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetVoteDetailsQueryKey = () => {
+  return [`/api/admin/vote-details`] as const;
+};
+
+export const getGetVoteDetailsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getVoteDetails>>,
+  TError = ErrorType<ErrorResponse>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getVoteDetails>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetVoteDetailsQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getVoteDetails>>> = ({
+    signal,
+  }) => getVoteDetails({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getVoteDetails>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetVoteDetailsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getVoteDetails>>
+>;
+export type GetVoteDetailsQueryError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Get detailed vote records (admin only)
+ */
+
+export function useGetVoteDetails<
+  TData = Awaited<ReturnType<typeof getVoteDetails>>,
+  TError = ErrorType<ErrorResponse>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getVoteDetails>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetVoteDetailsQueryOptions(options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
     queryKey: QueryKey;

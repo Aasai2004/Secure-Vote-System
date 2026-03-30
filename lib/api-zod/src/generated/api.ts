@@ -156,3 +156,19 @@ export const GetResultsResponse = zod.object({
     })
     .optional(),
 });
+
+/**
+ * @summary Get detailed vote records (admin only)
+ */
+export const GetVoteDetailsResponseItem = zod.object({
+  voteId: zod.number(),
+  voterId: zod.number(),
+  voterName: zod.string(),
+  voterAadhar: zod.string(),
+  candidateId: zod.number(),
+  candidateName: zod.string(),
+  candidateParty: zod.string(),
+  candidateSymbol: zod.string(),
+  votedAt: zod.string(),
+});
+export const GetVoteDetailsResponse = zod.array(GetVoteDetailsResponseItem);

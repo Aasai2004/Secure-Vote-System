@@ -48,6 +48,10 @@ artifacts-monorepo/
 │           └── candidates.ts # Candidates table
 ```
 
+## Vote Tracking
+
+Individual votes are stored in the `votes` table linking voter → candidate. The admin results page shows a full "Voter Audit Log" with who voted for whom (Aadhar masked), visible only to admins.
+
 ## API Routes
 
 All routes under `/api`:

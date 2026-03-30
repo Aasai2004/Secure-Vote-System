@@ -2,6 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   useGetVoters,
   useGetCandidates,
+  useGetVoteDetails,
   useAddVoter as useApiAddVoter,
   useDeleteVoter as useApiDeleteVoter,
   useAddCandidate as useApiAddCandidate,
@@ -17,6 +18,7 @@ export function useAdmin() {
 
   const votersQuery = useGetVoters();
   const candidatesQuery = useGetCandidates();
+  const voteDetailsQuery = useGetVoteDetails({ query: { retry: false } });
 
   const addVoterMutation = useApiAddVoter({
     mutation: {
@@ -74,6 +76,9 @@ export function useAdmin() {
     addCandidate: addCandidateMutation.mutate,
     isAddingCandidate: addCandidateMutation.isPending,
     
-    deleteCandidate: deleteCandidateMutation.mutate
+    deleteCandidate: deleteCandidateMutation.mutate,
+
+    voteDetails: voteDetailsQuery.data || [],
+    isLoadingVoteDetails: voteDetailsQuery.isLoading,
   };
 }

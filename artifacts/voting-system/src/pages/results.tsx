@@ -1,13 +1,17 @@
 import { useVoting } from "@/hooks/use-voting";
+import { useAdmin } from "@/hooks/use-admin";
+import { useAuth } from "@/hooks/use-auth";
 import { Card } from "@/components/ui/card";
-import { Crown, TrendingUp, Users } from "lucide-react";
-import { 
+import { Crown, TrendingUp, Users, ShieldCheck, Clock } from "lucide-react";
+import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell
 } from "recharts";
 import { motion } from "framer-motion";
 
 export default function Results() {
   const { results, isLoadingResults } = useVoting();
+  const { user } = useAuth();
+  const { voteDetails, isLoadingVoteDetails } = useAdmin();
 
   if (isLoadingResults || !results) {
     return (
@@ -17,7 +21,6 @@ export default function Results() {
     );
   }
 
-  // Predefined colors for charts (matching our civic theme)
   const chartColors = ['#0c2340', '#d4af37', '#1a5f7a', '#228b22', '#c0392b'];
 
   return (
@@ -80,17 +83,14 @@ export default function Results() {
             <div className="absolute top-0 right-0 p-8 opacity-10">
               <Crown className="w-48 h-48" />
             </div>
-            
             <h3 className="text-xl font-bold text-accent mb-8 flex items-center gap-2">
               <Crown className="w-6 h-6" /> Current Leader
             </h3>
-            
             {results.winner ? (
               <div className="relative z-10">
                 <div className="text-6xl mb-6">{results.winner.symbol}</div>
                 <h2 className="text-4xl font-serif font-bold mb-2">{results.winner.name}</h2>
                 <p className="text-xl text-white/80 font-medium mb-8">{results.winner.party}</p>
-                
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm font-bold text-white/90">
                     <span>VOTES SECURED</span>
@@ -118,27 +118,21 @@ export default function Results() {
               <div className="h-[400px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={results.candidates} margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
-                    <XAxis 
-                      dataKey="name" 
-                      axisLine={false} 
-                      tickLine={false} 
+                    <XAxis
+                      dataKey="name"
+                      axisLine={false}
+                      tickLine={false}
                       tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12, fontWeight: 600 }}
                       dy={10}
                     />
-                    <YAxis 
-                      hide
-                    />
-                    <Tooltip 
+                    <YAxis hide />
+                    <Tooltip
                       cursor={{ fill: 'hsl(var(--muted)/0.5)' }}
                       contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                       formatter={(value: number) => [`${value} Votes`, 'Count']}
                     />
-                    <Bar 
-                      dataKey="voteCount" 
-                      radius={[6, 6, 0, 0]}
-                      animationDuration={1500}
-                    >
-                      {results.candidates.map((entry, index) => (
+                    <Bar dataKey="voteCount" radius={[6, 6, 0, 0]} animationDuration={1500}>
+                      {results.candidates.map((_, index) => (
                         <Cell key={`cell-${index}`} fill={chartColors[index % chartColors.length]} />
                       ))}
                     </Bar>
@@ -153,9 +147,9 @@ export default function Results() {
           </Card>
         </div>
       </div>
-      
-      {/* Detailed Table */}
-      <Card className="overflow-hidden border-border/50 shadow-sm mt-8">
+
+      {/* Detailed Tabulation */}
+      <Card className="overflow-hidden border-border/50 shadow-sm">
         <div className="p-6 border-b border-border/50 bg-muted/20">
           <h3 className="text-xl font-bold font-serif">Detailed Tabulation</h3>
         </div>
@@ -170,22 +164,24 @@ export default function Results() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
-              {results.candidates.sort((a,b) => b.voteCount - a.voteCount).map((c, i) => (
+              {[...results.candidates].sort((a, b) => b.voteCount - a.voteCount).map((c, i) => (
                 <tr key={c.id} className="hover:bg-muted/30 transition-colors">
-                  <td className="px-6 py-4 font-medium text-base flex items-center gap-3">
-                    <span className="text-2xl">{c.symbol}</span>
-                    {c.name}
-                    {i === 0 && results.totalVotes > 0 && <Crown className="w-4 h-4 text-accent ml-2" />}
+                  <td className="px-6 py-4 font-medium text-base">
+                    <span className="flex items-center gap-3">
+                      <span className="text-2xl">{c.symbol}</span>
+                      {c.name}
+                      {i === 0 && results.totalVotes > 0 && <Crown className="w-4 h-4 text-amber-500 ml-1" />}
+                    </span>
                   </td>
                   <td className="px-6 py-4 text-muted-foreground">{c.party}</td>
                   <td className="px-6 py-4 text-right font-mono text-lg font-bold">{c.voteCount}</td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-3">
                       <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-primary transition-all duration-1000" 
+                        <div
+                          className="h-full rounded-full transition-all duration-1000"
                           style={{ width: `${c.percentage}%`, backgroundColor: chartColors[i % chartColors.length] }}
-                        ></div>
+                        />
                       </div>
                       <span className="font-mono font-medium w-12">{c.percentage.toFixed(1)}%</span>
                     </div>
@@ -201,6 +197,79 @@ export default function Results() {
           </table>
         </div>
       </Card>
+
+      {/* Admin-only: Who Voted for Whom */}
+      {user?.isAdmin && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <Card className="overflow-hidden border-border/50 shadow-sm">
+            <div className="p-6 border-b border-border/50 bg-gradient-to-r from-[#0c2340]/5 to-transparent flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-primary/10">
+                <ShieldCheck className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold font-serif">Voter Audit Log</h3>
+                <p className="text-sm text-muted-foreground">Admin only — complete record of every cast vote</p>
+              </div>
+              <div className="ml-auto bg-primary/10 text-primary text-xs font-bold px-3 py-1 rounded-full">
+                ADMIN VIEW
+              </div>
+            </div>
+
+            {isLoadingVoteDetails ? (
+              <div className="flex justify-center items-center py-16">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            ) : voteDetails.length === 0 ? (
+              <div className="py-16 text-center text-muted-foreground">
+                No votes have been cast yet.
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm text-left">
+                  <thead className="bg-muted text-muted-foreground uppercase text-xs">
+                    <tr>
+                      <th className="px-6 py-3 font-semibold">#</th>
+                      <th className="px-6 py-3 font-semibold">Voter Name</th>
+                      <th className="px-6 py-3 font-semibold">Aadhar (masked)</th>
+                      <th className="px-6 py-3 font-semibold">Voted For</th>
+                      <th className="px-6 py-3 font-semibold">Party</th>
+                      <th className="px-6 py-3 font-semibold">Time</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/50">
+                    {voteDetails.map((record, i) => (
+                      <tr key={record.voteId} className="hover:bg-muted/20 transition-colors">
+                        <td className="px-6 py-3 text-muted-foreground font-mono">{i + 1}</td>
+                        <td className="px-6 py-3 font-semibold">{record.voterName}</td>
+                        <td className="px-6 py-3 font-mono text-muted-foreground">
+                          ••••••••{record.voterAadhar.slice(-4)}
+                        </td>
+                        <td className="px-6 py-3">
+                          <span className="flex items-center gap-2 font-medium">
+                            <span className="text-lg">{record.candidateSymbol}</span>
+                            {record.candidateName}
+                          </span>
+                        </td>
+                        <td className="px-6 py-3 text-muted-foreground">{record.candidateParty}</td>
+                        <td className="px-6 py-3 text-muted-foreground">
+                          <span className="flex items-center gap-1.5">
+                            <Clock className="w-3.5 h-3.5" />
+                            {new Date(record.votedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </Card>
+        </motion.div>
+      )}
     </div>
   );
 }

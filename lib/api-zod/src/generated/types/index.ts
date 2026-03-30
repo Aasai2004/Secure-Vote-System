@@ -17,4 +17,5 @@ export * from "./loginRequest";
 export * from "./loginResponse";
 export * from "./messageResponse";
 export * from "./voter";
+export * from "./voteRecord";
 export * from "./votingResults";

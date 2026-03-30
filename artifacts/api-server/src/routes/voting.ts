@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { db, votersTable, candidatesTable } from "@workspace/db";
+import { db, votersTable, candidatesTable, votesTable } from "@workspace/db";
 import { eq, sql } from "drizzle-orm";
 import { CastVoteBody } from "@workspace/api-zod";
 
@@ -50,6 +50,11 @@ router.post("/cast", async (req, res) => {
   await db.update(votersTable)
     .set({ hasVoted: true })
     .where(eq(votersTable.id, voterId));
+
+  await db.insert(votesTable).values({
+    voterId: voter.id,
+    candidateId: candidate.id,
+  });
 
   res.json({ message: "Vote cast successfully" });
 });

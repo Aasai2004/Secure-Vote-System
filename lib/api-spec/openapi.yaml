@@ -234,6 +234,33 @@ paths:
               schema:
                 $ref: "#/components/schemas/VotingResults"
 
+  /admin/vote-details:
+    get:
+      operationId: getVoteDetails
+      tags: [admin]
+      summary: Get detailed vote records (admin only)
+      responses:
+        "200":
+          description: Detailed vote records
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/VoteRecord"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Admin only
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   schemas:
     HealthStatus:
@@ -367,3 +394,26 @@ components:
         winner:
           $ref: "#/components/schemas/CandidateResult"
       required: [candidates, totalVotes, totalVoters]
+
+    VoteRecord:
+      type: object
+      properties:
+        voteId:
+          type: integer
+        voterId:
+          type: integer
+        voterName:
+          type: string
+        voterAadhar:
+          type: string
+        candidateId:
+          type: integer
+        candidateName:
+          type: string
+        candidateParty:
+          type: string
+        candidateSymbol:
+          type: string
+        votedAt:
+          type: string
+      required: [voteId, voterId, voterName, voterAadhar, candidateId, candidateName, candidateParty, candidateSymbol, votedAt]

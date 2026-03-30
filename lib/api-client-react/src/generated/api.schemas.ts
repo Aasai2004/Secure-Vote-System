@@ -75,3 +75,15 @@ export interface VotingResults {
   totalVoters: number;
   winner?: CandidateResult;
 }
+
+export interface VoteRecord {
+  voteId: number;
+  voterId: number;
+  voterName: string;
+  voterAadhar: string;
+  candidateId: number;
+  candidateName: string;
+  candidateParty: string;
+  candidateSymbol: string;
+  votedAt: string;
+}

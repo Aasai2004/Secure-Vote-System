@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { db, votersTable, candidatesTable } from "@workspace/db";
+import { db, votersTable, candidatesTable, votesTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { AddVoterBody, AddCandidateBody, DeleteVoterParams, DeleteCandidateParams } from "@workspace/api-zod";
 
@@ -132,6 +132,41 @@ router.delete("/candidates/:id", async (req, res) => {
 
   await db.delete(candidatesTable).where(eq(candidatesTable.id, parsed.data.id));
   res.json({ message: "Candidate deleted successfully" });
+});
+
+router.get("/vote-details", async (req, res) => {
+  if (!(await requireAdmin(req, res))) return;
+
+  const voteRecords = await db
+    .select({
+      voteId: votesTable.id,
+      voterId: votersTable.id,
+      voterName: votersTable.name,
+      voterAadhar: votersTable.aadharNumber,
+      candidateId: candidatesTable.id,
+      candidateName: candidatesTable.name,
+      candidateParty: candidatesTable.party,
+      candidateSymbol: candidatesTable.symbol,
+      votedAt: votesTable.votedAt,
+    })
+    .from(votesTable)
+    .innerJoin(votersTable, eq(votesTable.voterId, votersTable.id))
+    .innerJoin(candidatesTable, eq(votesTable.candidateId, candidatesTable.id))
+    .orderBy(votesTable.votedAt);
+
+  res.json(
+    voteRecords.map((r) => ({
+      voteId: r.voteId,
+      voterId: r.voterId,
+      voterName: r.voterName,
+      voterAadhar: r.voterAadhar,
+      candidateId: r.candidateId,
+      candidateName: r.candidateName,
+      candidateParty: r.candidateParty,
+      candidateSymbol: r.candidateSymbol,
+      votedAt: r.votedAt.toISOString(),
+    }))
+  );
 });
 
 export default router;
