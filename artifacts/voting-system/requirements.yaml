@@ -1,0 +1,15 @@
+packages:
+  "framer-motion": "For page transitions and smooth micro-interactions"
+  "recharts": "For the digital voting results bar chart visualization"
+  "lucide-react": "For professional iconography"
+  "clsx": "Utility for constructing className strings"
+  "tailwind-merge": "Utility for merging tailwind classes"
+
+images:
+  - path: "artifacts/voting-system/public/images/civic-hero.png"
+    description: "A clean, modern, abstract geometric background with deep navy blue, white, and subtle silver colors, conveying trust, democracy, and security. Professional government civic style."
+    aspect_ratio: "16:9"
+
+notes:
+  - The application relies on the generated API hooks in @workspace/api-client-react.
+  - Auth uses a simple Aadhar number system, session is validated via /api/auth/me.

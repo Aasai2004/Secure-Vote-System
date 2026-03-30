@@ -1,22 +1,28 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Digital Voting System API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication
+  - name: admin
+    description: Admin operations
+  - name: voting
+    description: Voting operations
+  - name: results
+    description: Results operations
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +30,210 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login with Aadhar number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Voter"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/voters:
+    get:
+      operationId: getVoters
+      tags: [admin]
+      summary: Get all voters
+      responses:
+        "200":
+          description: List of voters
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Voter"
+    post:
+      operationId: addVoter
+      tags: [admin]
+      summary: Add a voter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddVoterRequest"
+      responses:
+        "201":
+          description: Voter added
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Voter"
+        "400":
+          description: Invalid data or voter already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/voters/{id}:
+    delete:
+      operationId: deleteVoter
+      tags: [admin]
+      summary: Delete a voter
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Voter deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  /admin/candidates:
+    get:
+      operationId: getCandidates
+      tags: [admin]
+      summary: Get all candidates
+      responses:
+        "200":
+          description: List of candidates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Candidate"
+    post:
+      operationId: addCandidate
+      tags: [admin]
+      summary: Add a candidate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddCandidateRequest"
+      responses:
+        "201":
+          description: Candidate added
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Candidate"
+
+  /admin/candidates/{id}:
+    delete:
+      operationId: deleteCandidate
+      tags: [admin]
+      summary: Delete a candidate
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Candidate deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  /voting/cast:
+    post:
+      operationId: castVote
+      tags: [voting]
+      summary: Cast a vote
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CastVoteRequest"
+      responses:
+        "200":
+          description: Vote cast successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "400":
+          description: Already voted or invalid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /results:
+    get:
+      operationId: getResults
+      tags: [results]
+      summary: Get voting results
+      responses:
+        "200":
+          description: Voting results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VotingResults"
+
 components:
   schemas:
     HealthStatus:
@@ -31,6 +241,129 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
+
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required: [message]
+
+    LoginRequest:
+      type: object
+      properties:
+        aadharNumber:
+          type: string
+        isAdmin:
+          type: boolean
+      required: [aadharNumber]
+
+    LoginResponse:
+      type: object
+      properties:
+        voter:
+          $ref: "#/components/schemas/Voter"
+        message:
+          type: string
+      required: [voter, message]
+
+    Voter:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        aadharNumber:
+          type: string
+        hasVoted:
+          type: boolean
+        isAdmin:
+          type: boolean
+        createdAt:
+          type: string
+      required: [id, name, aadharNumber, hasVoted, isAdmin, createdAt]
+
+    AddVoterRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        aadharNumber:
+          type: string
+        isAdmin:
+          type: boolean
+      required: [name, aadharNumber]
+
+    Candidate:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        party:
+          type: string
+        symbol:
+          type: string
+        voteCount:
+          type: integer
+      required: [id, name, party, symbol, voteCount]
+
+    AddCandidateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        party:
+          type: string
+        symbol:
+          type: string
+      required: [name, party, symbol]
+
+    CastVoteRequest:
+      type: object
+      properties:
+        candidateId:
+          type: integer
+      required: [candidateId]
+
+    CandidateResult:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        party:
+          type: string
+        symbol:
+          type: string
+        voteCount:
+          type: integer
+        percentage:
+          type: number
+      required: [id, name, party, symbol, voteCount, percentage]
+
+    VotingResults:
+      type: object
+      properties:
+        candidates:
+          type: array
+          items:
+            $ref: "#/components/schemas/CandidateResult"
+        totalVotes:
+          type: integer
+        totalVoters:
+          type: integer
+        winner:
+          $ref: "#/components/schemas/CandidateResult"
+      required: [candidates, totalVotes, totalVoters]
