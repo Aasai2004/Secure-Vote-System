@@ -24,22 +24,9 @@ export function useAuth() {
     mutation: {
       onSuccess: (data) => {
         queryClient.setQueryData(getGetMeQueryKey(), data.voter);
-        toast({
-          title: "Welcome back",
-          description: data.message,
-        });
-        if (data.voter.isAdmin) {
-          setLocation("/admin");
-        } else {
-          setLocation("/vote");
-        }
       },
-      onError: (err: any) => {
-        toast({
-          title: "Authentication Failed",
-          description: err?.error || "Invalid Aadhar number or permissions.",
-          variant: "destructive",
-        });
+      onError: (_err: any) => {
+        // errors handled in component
       }
     }
   });
