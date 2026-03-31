@@ -117,21 +117,40 @@ export default function Results() {
             {results.candidates.length > 0 ? (
               <div className="h-[400px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={results.candidates} margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
+                  <BarChart
+                    data={results.candidates}
+                    margin={{ top: 20, right: 20, left: 0, bottom: 80 }}
+                  >
                     <XAxis
                       dataKey="name"
                       axisLine={false}
                       tickLine={false}
-                      tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12, fontWeight: 600 }}
-                      dy={10}
+                      interval={0}
+                      angle={-35}
+                      textAnchor="end"
+                      tick={{ fill: 'hsl(var(--foreground))', fontSize: 13, fontWeight: 600 }}
+                      height={80}
                     />
-                    <YAxis hide />
+                    <YAxis
+                      hide={false}
+                      axisLine={false}
+                      tickLine={false}
+                      allowDecimals={false}
+                      tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                      width={30}
+                    />
                     <Tooltip
-                      cursor={{ fill: 'hsl(var(--muted)/0.5)' }}
-                      contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                      cursor={{ fill: 'hsl(var(--muted))', opacity: 0.4 }}
+                      contentStyle={{
+                        borderRadius: '12px',
+                        border: '1px solid hsl(var(--border))',
+                        boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
+                        padding: '10px 16px',
+                      }}
                       formatter={(value: number) => [`${value} Votes`, 'Count']}
+                      labelFormatter={(label) => `Candidate: ${label}`}
                     />
-                    <Bar dataKey="voteCount" radius={[6, 6, 0, 0]} animationDuration={1500}>
+                    <Bar dataKey="voteCount" radius={[8, 8, 0, 0]} animationDuration={1200} maxBarSize={80}>
                       {results.candidates.map((_, index) => (
                         <Cell key={`cell-${index}`} fill={chartColors[index % chartColors.length]} />
                       ))}
