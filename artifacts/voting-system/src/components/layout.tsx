@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
-import { Landmark, LogOut, BarChart3, ShieldCheck, Settings } from "lucide-react";
+import { Landmark, LogOut, BarChart3, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
@@ -33,15 +33,6 @@ export function Layout({ children }: { children: ReactNode }) {
               >
                 <BarChart3 className="h-4 w-4" />
                 <span className="hidden sm:inline">Live Results</span>
-              </Link>
-
-              {/* Admin — always visible in ribbon */}
-              <Link
-                href="/admin"
-                className={`text-sm font-medium transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-white/10 ${location === "/admin" ? "bg-white/15 text-white" : "text-white/80 hover:text-white"}`}
-              >
-                <Settings className="h-4 w-4" />
-                <span className="hidden sm:inline">Admin</span>
               </Link>
 
               {/* Divider + user info + logout when logged in */}

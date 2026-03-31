@@ -73,7 +73,7 @@ export default function Verify() {
           // Show "done" step briefly, then auto-redirect
           setTimeout(() => setStep("done"), 500);
           setTimeout(() => {
-            setLocation(user.isAdmin ? "/admin" : "/vote");
+            setLocation("/vote");
           }, 2000);
           return 100;
         }
@@ -279,7 +279,7 @@ export default function Verify() {
                 <div className="w-full flex items-center justify-center gap-3 p-4 rounded-xl bg-primary/5 border border-primary/20">
                   <Loader2 className="h-4 w-4 text-primary animate-spin shrink-0" />
                   <span className="text-sm font-semibold text-primary">
-                    {user.isAdmin ? "Redirecting to Admin Panel..." : "Redirecting to Voting Page..."}
+                    Redirecting to Voting Page...
                   </span>
                 </div>
               </motion.div>
