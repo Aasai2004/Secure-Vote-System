@@ -21,7 +21,11 @@ export default function Results() {
     );
   }
 
-  const chartColors = ['#0c2340', '#d4af37', '#1a5f7a', '#228b22', '#c0392b'];
+  const chartColors = ['#1e40af', '#d97706', '#059669', '#dc2626', '#7c3aed'];
+
+  // Ensure Y-axis always has a visible range (min 5 ticks even with 0 votes)
+  const maxVotes = Math.max(...(results.candidates.map(c => c.voteCount)), 0);
+  const yAxisMax = Math.max(maxVotes + 1, 5);
 
   return (
     <div className="space-y-10 max-w-6xl mx-auto">
@@ -115,44 +119,64 @@ export default function Results() {
           <Card className="p-6 h-full shadow-md border-border/50">
             <h3 className="text-xl font-bold mb-6 font-serif">Vote Distribution</h3>
             {results.candidates.length > 0 ? (
-              <div className="h-[400px] w-full">
+              <div style={{ width: '100%', height: 420 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
                     data={results.candidates}
-                    margin={{ top: 20, right: 20, left: 0, bottom: 80 }}
+                    margin={{ top: 10, right: 20, left: 10, bottom: 90 }}
+                    barCategoryGap="30%"
                   >
                     <XAxis
                       dataKey="name"
-                      axisLine={false}
+                      axisLine={{ stroke: '#e2e8f0' }}
                       tickLine={false}
                       interval={0}
                       angle={-35}
                       textAnchor="end"
-                      tick={{ fill: 'hsl(var(--foreground))', fontSize: 13, fontWeight: 600 }}
-                      height={80}
+                      tick={{ fill: '#1e293b', fontSize: 13, fontWeight: 700 }}
+                      height={90}
                     />
                     <YAxis
-                      hide={false}
                       axisLine={false}
                       tickLine={false}
                       allowDecimals={false}
-                      tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
-                      width={30}
+                      domain={[0, yAxisMax]}
+                      tick={{ fill: '#64748b', fontSize: 12 }}
+                      width={35}
                     />
                     <Tooltip
-                      cursor={{ fill: 'hsl(var(--muted))', opacity: 0.4 }}
+                      cursor={{ fill: '#f1f5f9' }}
                       contentStyle={{
-                        borderRadius: '12px',
-                        border: '1px solid hsl(var(--border))',
-                        boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
+                        borderRadius: '10px',
+                        border: '1px solid #e2e8f0',
+                        boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
                         padding: '10px 16px',
+                        fontSize: '13px',
+                        fontWeight: 600,
                       }}
-                      formatter={(value: number) => [`${value} Votes`, 'Count']}
-                      labelFormatter={(label) => `Candidate: ${label}`}
+                      formatter={(value: number) => [`${value} Votes`, 'Vote Count']}
+                      labelFormatter={(label) => `📋 ${label}`}
                     />
-                    <Bar dataKey="voteCount" radius={[8, 8, 0, 0]} animationDuration={1200} maxBarSize={80}>
+                    <Bar
+                      dataKey="voteCount"
+                      radius={[8, 8, 0, 0]}
+                      animationDuration={1000}
+                      maxBarSize={90}
+                      minPointSize={6}
+                      label={{
+                        position: 'top',
+                        fill: '#1e293b',
+                        fontSize: 13,
+                        fontWeight: 700,
+                        formatter: (val: number) => val > 0 ? val : '',
+                      }}
+                    >
                       {results.candidates.map((_, index) => (
-                        <Cell key={`cell-${index}`} fill={chartColors[index % chartColors.length]} />
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={chartColors[index % chartColors.length]}
+                          fillOpacity={1}
+                        />
                       ))}
                     </Bar>
                   </BarChart>
@@ -160,7 +184,7 @@ export default function Results() {
               </div>
             ) : (
               <div className="flex items-center justify-center h-[400px] text-muted-foreground bg-muted/30 rounded-xl">
-                Insufficient data to display chart
+                No candidates registered yet
               </div>
             )}
           </Card>
