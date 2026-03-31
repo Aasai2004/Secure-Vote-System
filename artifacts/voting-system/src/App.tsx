@@ -9,6 +9,7 @@ import Verify from "@/pages/verify";
 import Vote from "@/pages/vote";
 import Admin from "@/pages/admin";
 import Results from "@/pages/results";
+import Success from "@/pages/success";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -45,6 +46,7 @@ function Router() {
         <Route path="/" component={Login} />
         <Route path="/verify" component={Verify} />
         <Route path="/vote" component={Vote} />
+        <Route path="/success" component={Success} />
         <Route path="/admin" component={Admin} />
         <Route path="/results" component={Results} />
         <Route component={NotFound} />
