@@ -70,20 +70,16 @@ export default function Verify() {
         if (p >= 100) {
           clearInterval(iv);
           setFpStatus("done");
-          setTimeout(() => setStep("done"), 600);
+          // Show "done" step briefly, then auto-redirect
+          setTimeout(() => setStep("done"), 500);
+          setTimeout(() => {
+            setLocation(user.isAdmin ? "/admin" : "/vote");
+          }, 2000);
           return 100;
         }
         return p + 3;
       });
     }, 80);
-  };
-
-  const handleProceed = () => {
-    if (user.isAdmin) {
-      setLocation("/admin");
-    } else {
-      setLocation("/vote");
-    }
   };
 
   const stepIndex = step === "face" ? 0 : step === "fingerprint" ? 1 : 2;
@@ -249,7 +245,7 @@ export default function Verify() {
               </motion.div>
             )}
 
-            {/* ── All done ── */}
+            {/* ── All done — auto-redirect ── */}
             {step === "done" && (
               <motion.div
                 key="done"
@@ -279,14 +275,13 @@ export default function Verify() {
                   ))}
                 </div>
 
-                <Button
-                  className="w-full h-12 text-base font-semibold rounded-xl bg-gradient-to-r from-green-600 to-green-500 hover:opacity-90 shadow-lg shadow-green-500/25"
-                  onClick={handleProceed}
-                >
-                  <Vote className="h-4 w-4 mr-2" />
-                  {user.isAdmin ? "Go to Admin Panel" : "Proceed to Vote"}
-                  <ArrowRight className="h-4 w-4 ml-2" />
-                </Button>
+                {/* Auto-redirect indicator */}
+                <div className="w-full flex items-center justify-center gap-3 p-4 rounded-xl bg-primary/5 border border-primary/20">
+                  <Loader2 className="h-4 w-4 text-primary animate-spin shrink-0" />
+                  <span className="text-sm font-semibold text-primary">
+                    {user.isAdmin ? "Redirecting to Admin Panel..." : "Redirecting to Voting Page..."}
+                  </span>
+                </div>
               </motion.div>
             )}
 
