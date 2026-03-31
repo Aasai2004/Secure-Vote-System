@@ -21,39 +21,35 @@
     .badge { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.8rem; border-radius: 999px; background: var(--primary-light); color: var(--primary); font-size: 0.78rem; font-weight: 600; margin-bottom: 1rem; }
     .login-panel { max-width: 400px; margin: 0 auto; }
     .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.75rem; box-shadow: 0 4px 24px rgba(26,79,153,0.06); }
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
     @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
-    .section-title { font-family: 'Libre Baskerville', serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .section-title { font-family: 'Libre Baskerville', serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; }
     .field { margin-bottom: 1rem; }
-    label { display: block; font-weight: 600; font-size: 0.83rem; margin-bottom: 0.35rem; color: var(--text); }
-    input[type="text"] { width: 100%; height: 42px; padding: 0 0.875rem; border: 1px solid var(--border); border-radius: 10px; font-size: 0.9rem; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); outline: none; transition: border-color 0.15s, box-shadow 0.15s; }
+    label { display: block; font-weight: 600; font-size: 0.83rem; margin-bottom: 0.35rem; }
+    input[type="text"] { width: 100%; height: 42px; padding: 0 0.875rem; border: 1px solid var(--border); border-radius: 10px; font-size: 0.9rem; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); outline: none; transition: border-color 0.15s; }
     input[type="text"]:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(26,79,153,0.1); }
-    .btn { height: 42px; padding: 0 1.25rem; border: none; border-radius: 10px; font-size: 0.9rem; font-family: 'Inter', sans-serif; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; transition: opacity 0.15s; }
-    .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; box-shadow: 0 3px 12px rgba(26,79,153,0.2); }
+    .btn { height: 42px; padding: 0 1.25rem; border: none; border-radius: 10px; font-size: 0.9rem; font-family: 'Inter', sans-serif; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; }
+    .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; width: 100%; }
     .btn-primary:hover { opacity: 0.9; }
-    .btn-full { width: 100%; }
-    .btn-danger { background: var(--error-bg); border: 1px solid var(--error-border); color: var(--error); padding: 0.25rem 0.6rem; height: 30px; font-size: 0.78rem; border-radius: 6px; cursor: pointer; font-family: 'Inter', sans-serif; font-weight: 600; transition: background 0.15s; }
+    .btn-danger { background: var(--error-bg); border: 1px solid var(--error-border); color: var(--error); padding: 0.25rem 0.6rem; height: 30px; font-size: 0.78rem; border-radius: 6px; cursor: pointer; font-family: 'Inter', sans-serif; font-weight: 600; }
     .btn-danger:hover { background: #fee2e2; }
-    .list-section { margin-top: 1.25rem; }
+    .list-wrap { margin-top: 1.25rem; }
     .list-empty { text-align: center; color: var(--muted); font-size: 0.875rem; padding: 1.25rem 0; }
     .item-row { display: flex; align-items: center; justify-content: space-between; padding: 0.7rem 0.875rem; border-radius: 10px; background: var(--bg); border: 1px solid var(--border); margin-bottom: 0.5rem; }
-    .item-info { flex: 1; min-width: 0; }
     .item-name { font-weight: 600; font-size: 0.9rem; }
     .item-meta { font-size: 0.78rem; color: var(--muted); margin-top: 0.1rem; }
-    .item-badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 999px; font-size: 0.7rem; font-weight: 700; margin-left: 0.4rem; }
-    .badge-admin { background: var(--primary-light); color: var(--primary); }
-    .badge-voted { background: #f0fdf4; color: var(--success); }
-    .toast { position: fixed; bottom: 1.5rem; right: 1.5rem; padding: 0.75rem 1.25rem; border-radius: 12px; font-size: 0.875rem; font-weight: 600; z-index: 200; transform: translateY(100px); opacity: 0; transition: transform 0.3s, opacity 0.3s; max-width: 320px; }
+    .badge-voted { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 999px; font-size: 0.7rem; font-weight: 700; background: #f0fdf4; color: var(--success); margin-left: 0.4rem; }
+    .toast { position: fixed; bottom: 1.5rem; right: 1.5rem; padding: 0.75rem 1.25rem; border-radius: 12px; font-size: 0.875rem; font-weight: 600; z-index: 200; transform: translateY(100px); opacity: 0; transition: transform 0.3s, opacity 0.3s; }
     .toast.show { transform: translateY(0); opacity: 1; }
     .toast.success { background: var(--success); color: #fff; }
     .toast.error { background: var(--error); color: #fff; }
     .error-box { background: var(--error-bg); border: 1px solid var(--error-border); border-radius: 10px; padding: 0.7rem 1rem; font-size: 0.85rem; color: var(--error); margin-bottom: 1rem; display: none; }
     .error-box.show { display: block; }
     .logout-btn { font-size: 0.8rem; color: var(--muted); background: none; border: 1px solid var(--border); border-radius: 6px; padding: 0.3rem 0.7rem; cursor: pointer; font-family: 'Inter', sans-serif; }
-    .logout-btn:hover { background: var(--bg); }
+    .header-row { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.5rem; gap: 1rem; }
     .spinner-sm { width: 15px; height: 15px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
-    @keyframes spin { to { transform: rotate(360deg); } }
     .spinner { width: 36px; height: 36px; border: 3px solid var(--primary-light); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 3rem auto; display: block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
@@ -67,22 +63,19 @@
       <a href="/result.html">📊 Results</a>
     </nav>
   </header>
-
   <main>
     <div class="container">
       <div id="content"><div class="spinner"></div></div>
     </div>
   </main>
-
   <div class="toast" id="toast"></div>
 
   <script>
     let currentAdmin = null;
 
-    function showToast(msg, type = 'success') {
+    function toast(msg, type = 'success') {
       const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.className = `toast ${type} show`;
+      t.textContent = msg; t.className = `toast ${type} show`;
       setTimeout(() => t.classList.remove('show'), 3000);
     }
 
@@ -102,14 +95,11 @@
         <div class="login-panel">
           <div class="badge">⚙️ Admin Access</div>
           <h1>Admin Login</h1>
-          <p class="subtitle">Login with your admin Aadhar number to manage the system.</p>
+          <p class="subtitle">Login with your admin Aadhar number to manage the election system.</p>
           <div class="card">
-            <div class="field">
-              <label for="adminAadhar">Admin Aadhar Number</label>
-              <input type="text" id="adminAadhar" inputmode="numeric" maxlength="12" placeholder="12-digit Aadhar number" autocomplete="off" />
-            </div>
-            <div class="error-box" id="loginError"></div>
-            <button class="btn btn-primary btn-full" id="loginBtn" onclick="adminLogin()">Login as Admin</button>
+            <div class="field"><label>Admin Aadhar Number</label><input type="text" id="adminAadhar" inputmode="numeric" maxlength="12" placeholder="12-digit Aadhar number" autocomplete="off" /></div>
+            <div class="error-box" id="loginErr"></div>
+            <button class="btn btn-primary" id="loginBtn" onclick="adminLogin()">Login as Admin</button>
           </div>
         </div>
       `;
@@ -118,7 +108,7 @@
 
     async function adminLogin() {
       const aadhar = document.getElementById('adminAadhar').value.trim();
-      if (aadhar.length !== 12) { showError('loginError', 'Enter a valid 12-digit Aadhar number'); return; }
+      if (aadhar.length !== 12) { showErr('loginErr', 'Enter a valid 12-digit Aadhar number'); return; }
       const btn = document.getElementById('loginBtn');
       btn.disabled = true; btn.innerHTML = '<span class="spinner-sm"></span>&nbsp; Logging in...';
       try {
@@ -126,23 +116,23 @@
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Login failed');
         if (!data.voter.isAdmin) throw new Error('This account does not have admin privileges');
-        currentAdmin = data.voter;
-        renderAdmin();
-      } catch (err) { showError('loginError', err.message); btn.disabled = false; btn.innerHTML = 'Login as Admin'; }
+        currentAdmin = data.voter; renderAdmin();
+      } catch (err) { showErr('loginErr', err.message); btn.disabled = false; btn.innerHTML = 'Login as Admin'; }
     }
 
-    function showError(id, msg) { const el = document.getElementById(id); el.textContent = msg; el.classList.add('show'); }
+    function showErr(id, msg) { const el = document.getElementById(id); el.textContent = msg; el.classList.add('show'); }
 
     async function renderAdmin() {
-      const [votersRes, candidatesRes] = await Promise.all([
+      const [vRes, cRes] = await Promise.all([
         fetch('/api/admin/voters', { credentials: 'include' }),
         fetch('/api/admin/candidates', { credentials: 'include' }),
       ]);
-      const voters = votersRes.ok ? await votersRes.json() : [];
-      const candidates = candidatesRes.ok ? await candidatesRes.json() : [];
+      const voters = vRes.ok ? await vRes.json() : [];
+      const candidates = cRes.ok ? await cRes.json() : [];
+      const normalVoters = voters.filter(v => !v.isAdmin);
 
       document.getElementById('content').innerHTML = `
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:gap">
+        <div class="header-row">
           <div>
             <div class="badge">⚙️ Admin Panel</div>
             <h1>Election Management</h1>
@@ -150,43 +140,39 @@
           </div>
           <button class="logout-btn" onclick="logout()">Logout</button>
         </div>
-
         <div class="grid-2">
-          <!-- Voters -->
           <div class="card">
-            <div class="section-title">👤 Voters (${voters.filter(v=>!v.isAdmin).length})</div>
-            <div class="field"><label>Full Name</label><input type="text" id="voterName" placeholder="e.g. Ramesh Kumar" /></div>
-            <div class="field"><label>Aadhar Number</label><input type="text" id="voterAadhar" inputmode="numeric" maxlength="12" placeholder="12-digit Aadhar" /></div>
-            <button class="btn btn-primary btn-full" onclick="addVoter()">+ Add Voter</button>
-            <div class="list-section">
-              ${voters.filter(v=>!v.isAdmin).length === 0 ? '<div class="list-empty">No voters registered</div>' :
-                voters.filter(v=>!v.isAdmin).map(v => `
+            <div class="section-title">👤 Voters (${normalVoters.length})</div>
+            <div class="field"><label>Full Name</label><input type="text" id="vName" placeholder="e.g. Ramesh Kumar" /></div>
+            <div class="field"><label>Aadhar Number</label><input type="text" id="vAadhar" inputmode="numeric" maxlength="12" placeholder="12-digit Aadhar" /></div>
+            <button class="btn btn-primary" onclick="addVoter()">+ Add Voter</button>
+            <div class="list-wrap">
+              ${normalVoters.length === 0 ? '<div class="list-empty">No voters registered</div>' :
+                normalVoters.map(v => `
                   <div class="item-row">
-                    <div class="item-info">
-                      <div class="item-name">${v.name}${v.hasVoted ? '<span class="item-badge badge-voted">Voted</span>' : ''}</div>
+                    <div>
+                      <div class="item-name">${v.name}${v.hasVoted ? '<span class="badge-voted">Voted</span>' : ''}</div>
                       <div class="item-meta">••••${v.aadharNumber.slice(-4)}</div>
                     </div>
-                    <button class="btn-danger" onclick="removeVoter(${v.id}, '${v.name}')">Remove</button>
+                    <button class="btn-danger" onclick="removeVoter(${v.id},'${v.name.replace(/'/g,"\\'")}')">Remove</button>
                   </div>`).join('')}
             </div>
           </div>
-
-          <!-- Candidates -->
           <div class="card">
             <div class="section-title">🗳️ Candidates (${candidates.length})</div>
-            <div class="field"><label>Candidate Name</label><input type="text" id="candName" placeholder="e.g. Amit Singh" /></div>
-            <div class="field"><label>Party Name</label><input type="text" id="candParty" placeholder="e.g. National Party" /></div>
-            <div class="field"><label>Symbol (emoji)</label><input type="text" id="candSymbol" placeholder="e.g. 🌸" /></div>
-            <button class="btn btn-primary btn-full" onclick="addCandidate()">+ Add Candidate</button>
-            <div class="list-section">
+            <div class="field"><label>Name</label><input type="text" id="cName" placeholder="e.g. Amit Singh" /></div>
+            <div class="field"><label>Party</label><input type="text" id="cParty" placeholder="e.g. National Party" /></div>
+            <div class="field"><label>Symbol (emoji)</label><input type="text" id="cSymbol" placeholder="e.g. 🌸" /></div>
+            <button class="btn btn-primary" onclick="addCandidate()">+ Add Candidate</button>
+            <div class="list-wrap">
               ${candidates.length === 0 ? '<div class="list-empty">No candidates registered</div>' :
                 candidates.map(c => `
                   <div class="item-row">
-                    <div class="item-info">
+                    <div>
                       <div class="item-name">${c.symbol} ${c.name}</div>
                       <div class="item-meta">${c.party} · ${c.voteCount} votes</div>
                     </div>
-                    <button class="btn-danger" onclick="removeCandidate(${c.id}, '${c.name}')">Remove</button>
+                    <button class="btn-danger" onclick="removeCandidate(${c.id},'${c.name.replace(/'/g,"\\'")}')">Remove</button>
                   </div>`).join('')}
             </div>
           </div>
@@ -195,56 +181,51 @@
     }
 
     async function addVoter() {
-      const name = document.getElementById('voterName').value.trim();
-      const aadhar = document.getElementById('voterAadhar').value.trim();
-      if (!name || aadhar.length !== 12) { showToast('Enter valid name and 12-digit Aadhar', 'error'); return; }
+      const name = document.getElementById('vName').value.trim();
+      const aadhar = document.getElementById('vAadhar').value.trim();
+      if (!name || aadhar.length !== 12) { toast('Enter valid name and 12-digit Aadhar', 'error'); return; }
       try {
         const res = await fetch('/api/admin/voters', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ name, aadharNumber: aadhar }) });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Failed');
-        showToast(`✅ ${name} added as voter`);
-        renderAdmin();
-      } catch (err) { showToast(err.message, 'error'); }
+        toast(`✅ ${name} added`); renderAdmin();
+      } catch (err) { toast(err.message, 'error'); }
     }
 
     async function removeVoter(id, name) {
       if (!confirm(`Remove voter "${name}"?`)) return;
       try {
         const res = await fetch(`/api/admin/voters/${id}`, { method: 'DELETE', credentials: 'include' });
-        if (!res.ok) { const d = await res.json(); throw new Error(d.error || 'Failed'); }
-        showToast(`Removed ${name}`);
-        renderAdmin();
-      } catch (err) { showToast(err.message, 'error'); }
+        if (!res.ok) { const d = await res.json(); throw new Error(d.error); }
+        toast(`Removed ${name}`); renderAdmin();
+      } catch (err) { toast(err.message, 'error'); }
     }
 
     async function addCandidate() {
-      const name = document.getElementById('candName').value.trim();
-      const party = document.getElementById('candParty').value.trim();
-      const symbol = document.getElementById('candSymbol').value.trim();
-      if (!name || !party || !symbol) { showToast('Fill in all candidate fields', 'error'); return; }
+      const name = document.getElementById('cName').value.trim();
+      const party = document.getElementById('cParty').value.trim();
+      const symbol = document.getElementById('cSymbol').value.trim();
+      if (!name || !party || !symbol) { toast('Fill in all candidate fields', 'error'); return; }
       try {
         const res = await fetch('/api/admin/candidates', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ name, party, symbol }) });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Failed');
-        showToast(`✅ ${name} added as candidate`);
-        renderAdmin();
-      } catch (err) { showToast(err.message, 'error'); }
+        toast(`✅ ${name} added`); renderAdmin();
+      } catch (err) { toast(err.message, 'error'); }
     }
 
     async function removeCandidate(id, name) {
       if (!confirm(`Remove candidate "${name}"?`)) return;
       try {
         const res = await fetch(`/api/admin/candidates/${id}`, { method: 'DELETE', credentials: 'include' });
-        if (!res.ok) { const d = await res.json(); throw new Error(d.error || 'Failed'); }
-        showToast(`Removed ${name}`);
-        renderAdmin();
-      } catch (err) { showToast(err.message, 'error'); }
+        if (!res.ok) { const d = await res.json(); throw new Error(d.error); }
+        toast(`Removed ${name}`); renderAdmin();
+      } catch (err) { toast(err.message, 'error'); }
     }
 
     async function logout() {
       await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
-      currentAdmin = null;
-      renderLogin();
+      currentAdmin = null; renderLogin();
     }
 
     init();

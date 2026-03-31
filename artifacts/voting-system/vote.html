@@ -13,7 +13,7 @@
     header { background: var(--card); border-bottom: 1px solid var(--border); padding: 0 2rem; height: 64px; display: flex; align-items: center; justify-content: space-between; }
     .logo { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 1.05rem; color: var(--primary); text-decoration: none; }
     nav a { font-size: 0.875rem; color: var(--muted); text-decoration: none; padding: 0.4rem 0.8rem; border-radius: 6px; }
-    main { flex: 1; display: flex; align-items: flex-start; justify-content: center; padding: 2rem 1rem; }
+    main { flex: 1; padding: 2rem 1rem; display: flex; justify-content: center; }
     .container { max-width: 560px; width: 100%; }
     .badge { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.8rem; border-radius: 999px; background: var(--primary-light); color: var(--primary); font-size: 0.78rem; font-weight: 600; margin-bottom: 1rem; }
     h1 { font-family: 'Libre Baskerville', serif; font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
@@ -30,15 +30,15 @@
     .step-line { width: 24px; height: 2px; background: #e5e7eb; }
     .voter-info { background: var(--primary-light); border-radius: 10px; padding: 0.75rem 1rem; font-size: 0.875rem; margin-bottom: 1.25rem; }
     .voter-info strong { color: var(--primary); }
-    .warning-box { background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 0.75rem 1rem; font-size: 0.83rem; color: #92400e; margin-bottom: 1.5rem; display: flex; gap: 0.5rem; align-items: flex-start; }
+    .warning-box { background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 0.75rem 1rem; font-size: 0.83rem; color: #92400e; margin-bottom: 1.5rem; }
     .candidates-list { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem; }
     .candidate-card { background: var(--card); border: 2px solid var(--border); border-radius: 14px; padding: 1.1rem 1.25rem; cursor: pointer; display: flex; align-items: center; gap: 1rem; transition: border-color 0.15s, background 0.15s, box-shadow 0.15s; }
     .candidate-card:hover { border-color: var(--primary); background: var(--primary-light); }
     .candidate-card.selected { border-color: var(--primary); background: var(--primary-light); box-shadow: 0 0 0 3px rgba(26,79,153,0.12); }
-    .candidate-symbol { font-size: 2rem; width: 52px; height: 52px; background: #fff; border: 1px solid var(--border); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .candidate-info { flex: 1; }
-    .candidate-name { font-weight: 700; font-size: 1.05rem; }
-    .candidate-party { font-size: 0.8rem; color: var(--muted); margin-top: 0.15rem; font-weight: 500; letter-spacing: 0.03em; text-transform: uppercase; }
+    .cand-symbol { font-size: 2rem; width: 52px; height: 52px; background: #fff; border: 1px solid var(--border); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .cand-info { flex: 1; }
+    .cand-name { font-weight: 700; font-size: 1.05rem; }
+    .cand-party { font-size: 0.8rem; color: var(--muted); margin-top: 0.15rem; font-weight: 500; text-transform: uppercase; }
     .radio-dot { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: border-color 0.15s; }
     .candidate-card.selected .radio-dot { border-color: var(--primary); }
     .radio-inner { width: 12px; height: 12px; background: var(--primary); border-radius: 50%; display: none; }
@@ -46,26 +46,26 @@
     .btn { width: 100%; height: 52px; border: none; border-radius: 12px; font-size: 0.975rem; font-family: 'Inter', sans-serif; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; box-shadow: 0 4px 16px rgba(26,79,153,0.25); transition: opacity 0.15s; }
     .btn:hover:not(:disabled) { opacity: 0.9; }
     .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .loading-screen { flex: 1; display: flex; align-items: center; justify-content: center; }
-    .spinner { width: 40px; height: 40px; border: 3px solid var(--primary-light); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.7s linear infinite; }
+    .loading-center { display: flex; justify-content: center; padding: 3rem 0; }
+    .spinner-lg { width: 40px; height: 40px; border: 3px solid var(--primary-light); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.7s linear infinite; }
     .spinner-sm { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    /* Confirm modal */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; align-items: center; justify-content: center; z-index: 100; padding: 1rem; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: none; align-items: center; justify-content: center; z-index: 100; padding: 1rem; }
     .modal-overlay.show { display: flex; }
     .modal { background: var(--card); border-radius: 20px; padding: 2rem; max-width: 380px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
     .modal h3 { font-family: 'Libre Baskerville', serif; font-size: 1.35rem; margin-bottom: 0.5rem; }
-    .modal p { color: var(--muted); font-size: 0.9rem; margin-bottom: 1.25rem; }
-    .modal-candidate { background: var(--primary-light); border-radius: 12px; padding: 1rem; display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .modal-desc { color: var(--muted); font-size: 0.9rem; margin-bottom: 1.25rem; }
+    .modal-candidate { background: var(--primary-light); border-radius: 12px; padding: 1rem; display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
     .modal-symbol { font-size: 1.75rem; }
     .modal-name { font-weight: 700; font-size: 1.05rem; }
     .modal-party { font-size: 0.8rem; color: var(--muted); font-weight: 500; text-transform: uppercase; }
+    .modal-warn { font-size: 0.82rem; color: var(--error); font-weight: 500; margin-bottom: 1.25rem; }
     .modal-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
-    .btn-outline { height: 44px; border: 2px solid var(--border); border-radius: 10px; background: transparent; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.9rem; cursor: pointer; color: var(--text); transition: background 0.15s; }
-    .btn-outline:hover { background: var(--bg); }
-    .btn-confirm { height: 44px; border: none; border-radius: 10px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
-    .error-msg { color: var(--error); font-size: 0.875rem; text-align: center; margin-top: 0.75rem; display: none; }
-    .error-msg.show { display: block; }
+    .btn-cancel { height: 44px; border: 2px solid var(--border); border-radius: 10px; background: transparent; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.9rem; cursor: pointer; color: var(--text); }
+    .btn-cancel:hover { background: var(--bg); }
+    .btn-confirm { height: 44px; border: none; border-radius: 10px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.4rem; }
+    .vote-error { color: var(--error); font-size: 0.875rem; text-align: center; margin-top: 0.75rem; display: none; }
+    .vote-error.show { display: block; }
   </style>
 </head>
 <body>
@@ -79,9 +79,9 @@
     </nav>
   </header>
 
-  <main id="mainContent">
-    <div class="loading-screen">
-      <div class="spinner"></div>
+  <main>
+    <div class="container" id="pageContent">
+      <div class="loading-center"><div class="spinner-lg"></div></div>
     </div>
   </main>
 
@@ -89,7 +89,7 @@
   <div class="modal-overlay" id="confirmModal">
     <div class="modal">
       <h3>Confirm Your Vote</h3>
-      <p>You are about to cast your vote for:</p>
+      <p class="modal-desc">You are about to cast your vote for:</p>
       <div class="modal-candidate">
         <div class="modal-symbol" id="confirmSymbol"></div>
         <div>
@@ -97,14 +97,12 @@
           <div class="modal-party" id="confirmParty"></div>
         </div>
       </div>
-      <p style="font-size:0.82rem;color:var(--error);margin-bottom:1.25rem;font-weight:500;">⚠️ This action cannot be undone. You can only vote once.</p>
+      <p class="modal-warn">⚠️ This action cannot be undone. You can only vote once.</p>
       <div class="modal-btns">
-        <button class="btn-outline" onclick="closeModal()">Cancel</button>
-        <button class="btn-confirm" id="confirmVoteBtn" onclick="castVote()">
-          🗳️ Confirm Vote
-        </button>
+        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn-confirm" id="confirmBtn" onclick="castVote()">🗳️ Confirm Vote</button>
       </div>
-      <div class="error-msg" id="voteError"></div>
+      <div class="vote-error" id="voteError"></div>
     </div>
   </div>
 
@@ -116,41 +114,33 @@
     async function init() {
       try {
         const meRes = await fetch('/api/auth/me', { credentials: 'include' });
-        if (!meRes.ok) { window.location.href = '/'; return; }
+        if (!meRes.ok) { window.location.replace('/'); return; }
         const voter = await meRes.json();
-        if (voter.hasVoted) { window.location.href = '/result.html'; return; }
+        if (voter.hasVoted) { window.location.replace('/result.html'); return; }
 
         const resultsRes = await fetch('/api/results');
         const data = await resultsRes.json();
         candidates = data.candidates;
-
         renderPage(voter);
-      } catch { window.location.href = '/'; }
+      } catch { window.location.replace('/'); }
     }
 
     function renderPage(voter) {
-      const main = document.getElementById('mainContent');
-      main.innerHTML = `
-        <div class="container">
-          <div class="badge">🗳️ Voting Booth</div>
-          <h1>Cast Your Vote</h1>
-          <p class="subtitle">Select one candidate from the list below and submit your vote.</p>
-          <div class="steps">
-            <div class="step"><div class="step-dot done">✓</div><span class="step-label inactive">Aadhar</span></div>
-            <div class="step-line"></div>
-            <div class="step"><div class="step-dot done">✓</div><span class="step-label inactive">Biometrics</span></div>
-            <div class="step-line"></div>
-            <div class="step"><div class="step-dot active">3</div><span class="step-label active">Vote</span></div>
-          </div>
-          <div class="voter-info">Voting as: <strong>${voter.name}</strong></div>
-          <div class="warning-box">
-            ⚠️ <span>You can only vote once. Your vote is final and cannot be changed after submission.</span>
-          </div>
-          <div class="candidates-list" id="candidatesList"></div>
-          <button class="btn" id="submitVoteBtn" disabled onclick="openModal()">
-            🗳️ &nbsp;Submit Vote
-          </button>
+      document.getElementById('pageContent').innerHTML = `
+        <div class="badge">🗳️ Voting Booth</div>
+        <h1>Cast Your Vote</h1>
+        <p class="subtitle">Select one candidate and submit your vote.</p>
+        <div class="steps">
+          <div class="step"><div class="step-dot done">✓</div><span class="step-label inactive">Aadhar</span></div>
+          <div class="step-line"></div>
+          <div class="step"><div class="step-dot done">✓</div><span class="step-label inactive">Biometrics</span></div>
+          <div class="step-line"></div>
+          <div class="step"><div class="step-dot active">3</div><span class="step-label active">Vote</span></div>
         </div>
+        <div class="voter-info">Voting as: <strong>${voter.name}</strong></div>
+        <div class="warning-box">⚠️ You can only vote once. Your vote is final and cannot be changed after submission.</div>
+        <div class="candidates-list" id="candidatesList"></div>
+        <button class="btn" id="submitBtn" disabled onclick="openModal()">🗳️ &nbsp;Submit Vote</button>
       `;
 
       const list = document.getElementById('candidatesList');
@@ -159,25 +149,22 @@
         card.className = 'candidate-card';
         card.dataset.id = c.id;
         card.innerHTML = `
-          <div class="candidate-symbol">${c.symbol}</div>
-          <div class="candidate-info">
-            <div class="candidate-name">${c.name}</div>
-            <div class="candidate-party">${c.party}</div>
+          <div class="cand-symbol">${c.symbol}</div>
+          <div class="cand-info">
+            <div class="cand-name">${c.name}</div>
+            <div class="cand-party">${c.party}</div>
           </div>
           <div class="radio-dot"><div class="radio-inner"></div></div>
         `;
-        card.addEventListener('click', () => selectCandidate(c.id, c));
+        card.addEventListener('click', () => {
+          selectedCandidateId = c.id;
+          selectedCandidate = c;
+          document.querySelectorAll('.candidate-card').forEach(el => el.classList.remove('selected'));
+          card.classList.add('selected');
+          document.getElementById('submitBtn').disabled = false;
+        });
         list.appendChild(card);
       });
-    }
-
-    function selectCandidate(id, candidate) {
-      selectedCandidateId = id;
-      selectedCandidate = candidate;
-      document.querySelectorAll('.candidate-card').forEach(el => el.classList.remove('selected'));
-      document.querySelector(`[data-id="${id}"]`).classList.add('selected');
-      const btn = document.getElementById('submitVoteBtn');
-      if (btn) btn.disabled = false;
     }
 
     function openModal() {
@@ -194,10 +181,9 @@
     }
 
     async function castVote() {
-      const btn = document.getElementById('confirmVoteBtn');
+      const btn = document.getElementById('confirmBtn');
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner-sm"></span>&nbsp; Submitting...';
-
       try {
         const res = await fetch('/api/voting/cast', {
           method: 'POST',
@@ -207,12 +193,11 @@
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Failed to cast vote');
-        closeModal();
         window.location.href = '/result.html';
       } catch (err) {
-        const errEl = document.getElementById('voteError');
-        errEl.textContent = err.message;
-        errEl.classList.add('show');
+        const el = document.getElementById('voteError');
+        el.textContent = err.message;
+        el.classList.add('show');
         btn.disabled = false;
         btn.innerHTML = '🗳️ Confirm Vote';
       }

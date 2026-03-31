@@ -30,13 +30,12 @@
     .step-line { width: 24px; height: 2px; background: #e5e7eb; }
     .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; box-shadow: 0 4px 24px rgba(26,79,153,0.06); }
     .scan-section { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 1.5rem 0; }
-    .scan-ring { position: relative; width: 140px; height: 140px; margin-bottom: 1.5rem; }
-    .scan-ring-inner { width: 140px; height: 140px; border-radius: 50%; background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 3rem; border: 3px solid var(--primary-light); transition: all 0.3s; position: relative; z-index: 1; }
-    .scan-ring-inner.scanning { border-color: var(--primary); box-shadow: 0 0 0 0 rgba(26,79,153,0.3); animation: pulse 1.4s infinite; }
+    .scan-ring-inner { width: 140px; height: 140px; border-radius: 50%; background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 3rem; border: 3px solid var(--primary-light); transition: all 0.3s; margin-bottom: 1.5rem; }
+    .scan-ring-inner.scanning { border-color: var(--primary); animation: pulse 1.4s infinite; }
     .scan-ring-inner.done { background: var(--success-bg); border-color: var(--success); }
     @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(26,79,153,0.3); } 70% { box-shadow: 0 0 0 20px rgba(26,79,153,0); } 100% { box-shadow: 0 0 0 0 rgba(26,79,153,0); } }
     .scan-title { font-weight: 700; font-size: 1.15rem; margin-bottom: 0.4rem; }
-    .scan-subtitle { color: var(--muted); font-size: 0.875rem; margin-bottom: 1.5rem; }
+    .scan-subtitle { color: var(--muted); font-size: 0.875rem; margin-bottom: 1.25rem; }
     .progress-bar { width: 100%; background: #f3f4f6; border-radius: 999px; height: 8px; overflow: hidden; margin-bottom: 0.5rem; }
     .progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--primary-dark)); border-radius: 999px; transition: width 0.1s linear; width: 0%; }
     .progress-fill.success { background: linear-gradient(90deg, var(--success), #15803d); }
@@ -45,16 +44,13 @@
     .btn { width: 100%; height: 48px; border: none; border-radius: 12px; font-size: 0.975rem; font-family: 'Inter', sans-serif; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: opacity 0.15s; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; box-shadow: 0 4px 16px rgba(26,79,153,0.25); }
     .btn:hover:not(:disabled) { opacity: 0.9; }
     .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn.success-btn { background: linear-gradient(135deg, var(--success), #15803d); box-shadow: 0 4px 16px rgba(22,163,74,0.25); }
-    .success-box { background: var(--success-bg); border: 1px solid var(--success-border); border-radius: 12px; padding: 1rem 1.25rem; display: none; align-items: center; gap: 0.75rem; margin-bottom: 1rem; font-size: 0.9rem; color: var(--success); font-weight: 600; }
-    .success-box.show { display: flex; }
-    .section-divider { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+    .success-box { background: var(--success-bg); border: 1px solid var(--success-border); border-radius: 12px; padding: 1rem 1.25rem; display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; font-size: 0.9rem; color: var(--success); font-weight: 600; }
     .voter-info { background: var(--primary-light); border-radius: 10px; padding: 0.75rem 1rem; font-size: 0.875rem; margin-bottom: 1.5rem; }
     .voter-info strong { color: var(--primary); }
     .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    #faceSection, #fingerprintSection, #doneSection { display: none; }
-    #faceSection.active, #fingerprintSection.active, #doneSection.active { display: block; }
+    .section { display: none; }
+    .section.active { display: block; }
   </style>
 </head>
 <body>
@@ -75,70 +71,47 @@
       <p class="subtitle">Complete face and fingerprint scan to proceed to voting.</p>
 
       <div class="steps">
-        <div class="step">
-          <div class="step-dot done">✓</div>
-          <span class="step-label inactive">Aadhar</span>
-        </div>
+        <div class="step"><div class="step-dot done">✓</div><span class="step-label inactive">Aadhar</span></div>
         <div class="step-line"></div>
-        <div class="step">
-          <div class="step-dot active">2</div>
-          <span class="step-label active">Biometrics</span>
-        </div>
+        <div class="step"><div class="step-dot active">2</div><span class="step-label active">Biometrics</span></div>
         <div class="step-line"></div>
-        <div class="step">
-          <div class="step-dot inactive">3</div>
-          <span class="step-label inactive">Vote</span>
-        </div>
+        <div class="step"><div class="step-dot inactive">3</div><span class="step-label inactive">Vote</span></div>
       </div>
 
-      <div class="voter-info" id="voterInfo">
-        Welcome, <strong id="voterName">Voter</strong>
-      </div>
+      <div class="voter-info">Welcome, <strong id="voterName">Voter</strong></div>
 
       <div class="card">
-        <!-- Face Scan Section -->
-        <div id="faceSection" class="active">
+        <!-- STEP 1: Face Scan -->
+        <div id="faceSection" class="section active">
           <div class="scan-section">
-            <div class="scan-ring">
-              <div class="scan-ring-inner" id="faceRing">📷</div>
-            </div>
+            <div class="scan-ring-inner" id="faceRing">📷</div>
             <div class="scan-title">Face Verification</div>
             <div class="scan-subtitle" id="faceSubtitle">Position your face in front of the camera and click Scan</div>
-            <div class="progress-bar">
-              <div class="progress-fill" id="faceProgress"></div>
-            </div>
-            <div class="progress-label" id="faceProgressLabel">Ready to scan</div>
+            <div class="progress-bar"><div class="progress-fill" id="faceProgress"></div></div>
+            <div class="progress-label" id="faceLabel">Ready to scan</div>
             <button class="btn" id="faceScanBtn" onclick="startFaceScan()">📷 &nbsp;Start Face Scan</button>
           </div>
         </div>
 
-        <!-- Fingerprint Section -->
-        <div id="fingerprintSection">
-          <div class="success-box show">
-            ✅ Face verification complete!
-          </div>
+        <!-- STEP 2: Fingerprint -->
+        <div id="fpSection" class="section">
+          <div class="success-box">✅ Face verification complete!</div>
           <div class="scan-section">
-            <div class="scan-ring">
-              <div class="scan-ring-inner" id="fpRing">👆</div>
-            </div>
+            <div class="scan-ring-inner" id="fpRing">👆</div>
             <div class="scan-title">Fingerprint Verification</div>
             <div class="scan-subtitle" id="fpSubtitle">Place your finger on the scanner and click Scan</div>
-            <div class="progress-bar">
-              <div class="progress-fill" id="fpProgress"></div>
-            </div>
-            <div class="progress-label" id="fpProgressLabel">Ready to scan</div>
+            <div class="progress-bar"><div class="progress-fill" id="fpProgress"></div></div>
+            <div class="progress-label" id="fpLabel">Ready to scan</div>
             <button class="btn" id="fpScanBtn" onclick="startFpScan()">👆 &nbsp;Start Fingerprint Scan</button>
           </div>
         </div>
 
-        <!-- Done Section -->
-        <div id="doneSection">
+        <!-- STEP 3: Done -->
+        <div id="doneSection" class="section">
           <div class="scan-section">
-            <div class="scan-ring">
-              <div class="scan-ring-inner done">✅</div>
-            </div>
+            <div class="scan-ring-inner done">✅</div>
             <div class="scan-title" style="color:var(--success)">Verification Complete!</div>
-            <div class="scan-subtitle">Both face and fingerprint verified successfully. Redirecting to voting...</div>
+            <div class="scan-subtitle">Both face and fingerprint verified. Redirecting to voting...</div>
           </div>
         </div>
       </div>
@@ -146,52 +119,54 @@
   </main>
 
   <script>
-    const voter = JSON.parse(sessionStorage.getItem('voter') || 'null');
-
-    // Redirect to login if not authenticated
+    // Check session on load
     (async () => {
       try {
         const res = await fetch('/api/auth/me', { credentials: 'include' });
-        if (!res.ok) { window.location.href = '/'; return; }
+        if (!res.ok) { window.location.replace('/'); return; }
         const data = await res.json();
         document.getElementById('voterName').textContent = data.name;
-        if (data.hasVoted) window.location.href = '/result.html';
-      } catch { window.location.href = '/'; }
+        if (data.hasVoted) { window.location.replace('/result.html'); return; }
+      } catch { window.location.replace('/'); }
     })();
 
-    if (voter) document.getElementById('voterName').textContent = voter.name;
+    // Also try from sessionStorage for instant name display
+    try {
+      const v = JSON.parse(sessionStorage.getItem('voter') || 'null');
+      if (v && v.name) document.getElementById('voterName').textContent = v.name;
+    } catch {}
+
+    function show(id) {
+      document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
 
     function startFaceScan() {
       const btn = document.getElementById('faceScanBtn');
       const ring = document.getElementById('faceRing');
-      const progressFill = document.getElementById('faceProgress');
-      const label = document.getElementById('faceProgressLabel');
-      const subtitle = document.getElementById('faceSubtitle');
+      const fill = document.getElementById('faceProgress');
+      const label = document.getElementById('faceLabel');
+      const sub = document.getElementById('faceSubtitle');
 
       btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span>&nbsp; Scanning...';
+      btn.innerHTML = '<span class="spinner"></span>&nbsp; Scanning face...';
       ring.classList.add('scanning');
-      subtitle.textContent = 'Scanning your face...';
+      sub.textContent = 'Scanning your face...';
 
       let pct = 0;
       const iv = setInterval(() => {
-        pct += 4;
-        progressFill.style.width = pct + '%';
-        label.textContent = `Scanning... ${pct}%`;
+        pct = Math.min(pct + 4, 100);
+        fill.style.width = pct + '%';
+        label.textContent = pct < 100 ? `Scanning... ${pct}%` : '✅ Face verified!';
         if (pct >= 100) {
           clearInterval(iv);
-          progressFill.classList.add('success');
-          label.textContent = '✅ Face verified!';
+          fill.classList.add('success');
           label.classList.add('success');
           ring.classList.remove('scanning');
           ring.classList.add('done');
           ring.textContent = '✅';
-          subtitle.textContent = 'Face scan complete.';
-          btn.innerHTML = '✓ Face Scanned';
-          setTimeout(() => {
-            document.getElementById('faceSection').classList.remove('active');
-            document.getElementById('fingerprintSection').classList.add('active');
-          }, 700);
+          sub.textContent = 'Face scan complete.';
+          setTimeout(() => show('fpSection'), 800);
         }
       }, 70);
     }
@@ -199,35 +174,32 @@
     function startFpScan() {
       const btn = document.getElementById('fpScanBtn');
       const ring = document.getElementById('fpRing');
-      const progressFill = document.getElementById('fpProgress');
-      const label = document.getElementById('fpProgressLabel');
-      const subtitle = document.getElementById('fpSubtitle');
+      const fill = document.getElementById('fpProgress');
+      const label = document.getElementById('fpLabel');
+      const sub = document.getElementById('fpSubtitle');
 
       btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span>&nbsp; Scanning...';
+      btn.innerHTML = '<span class="spinner"></span>&nbsp; Scanning fingerprint...';
       ring.classList.add('scanning');
-      subtitle.textContent = 'Reading your fingerprint...';
+      sub.textContent = 'Reading your fingerprint...';
 
       let pct = 0;
       const iv = setInterval(() => {
-        pct += 3;
-        progressFill.style.width = pct + '%';
-        label.textContent = `Scanning... ${pct}%`;
+        pct = Math.min(pct + 3, 100);
+        fill.style.width = pct + '%';
+        label.textContent = pct < 100 ? `Scanning... ${pct}%` : '✅ Fingerprint verified!';
         if (pct >= 100) {
           clearInterval(iv);
-          progressFill.classList.add('success');
-          label.textContent = '✅ Fingerprint verified!';
+          fill.classList.add('success');
           label.classList.add('success');
           ring.classList.remove('scanning');
           ring.classList.add('done');
           ring.textContent = '✅';
-          subtitle.textContent = 'Fingerprint scan complete.';
-          btn.innerHTML = '✓ Fingerprint Scanned';
+          sub.textContent = 'Fingerprint scan complete.';
           setTimeout(() => {
-            document.getElementById('fingerprintSection').classList.remove('active');
-            document.getElementById('doneSection').classList.add('active');
-            setTimeout(() => { window.location.href = '/vote.html'; }, 1800);
-          }, 600);
+            show('doneSection');
+            setTimeout(() => { window.location.href = '/vote.html'; }, 1500);
+          }, 700);
         }
       }, 70);
     }
