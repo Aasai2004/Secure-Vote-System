@@ -8,6 +8,7 @@ export const votersTable = pgTable("voters", {
   aadharNumber: text("aadhar_number").notNull().unique(),
   hasVoted: boolean("has_voted").notNull().default(false),
   isAdmin: boolean("is_admin").notNull().default(false),
+  faceDescriptor: text("face_descriptor"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 

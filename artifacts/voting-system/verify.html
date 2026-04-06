@@ -6,9 +6,10 @@
   <title>Biometric Verification – Digital Voting System</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
+  <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root { --primary: #1a4f99; --primary-dark: #0f3b75; --primary-light: #e8f0fc; --text: #1a1a2e; --muted: #6b7280; --border: #e5e7eb; --bg: #f8fafc; --card: #ffffff; --success: #16a34a; --success-bg: #f0fdf4; --success-border: #bbf7d0; }
+    :root { --primary: #1a4f99; --primary-dark: #0f3b75; --primary-light: #e8f0fc; --text: #1a1a2e; --muted: #6b7280; --border: #e5e7eb; --bg: #f8fafc; --card: #ffffff; --success: #16a34a; --success-bg: #f0fdf4; --success-border: #bbf7d0; --error: #dc2626; --error-bg: #fef2f2; }
     body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
     header { background: var(--card); border-bottom: 1px solid var(--border); padding: 0 2rem; height: 64px; display: flex; align-items: center; justify-content: space-between; }
     .logo { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 1.05rem; color: var(--primary); text-decoration: none; }
@@ -29,28 +30,48 @@
     .step-label.inactive { color: var(--muted); }
     .step-line { width: 24px; height: 2px; background: #e5e7eb; }
     .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; box-shadow: 0 4px 24px rgba(26,79,153,0.06); }
-    .scan-section { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 1.5rem 0; }
-    .scan-ring-inner { width: 140px; height: 140px; border-radius: 50%; background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 3rem; border: 3px solid var(--primary-light); transition: all 0.3s; margin-bottom: 1.5rem; }
-    .scan-ring-inner.scanning { border-color: var(--primary); animation: pulse 1.4s infinite; }
-    .scan-ring-inner.done { background: var(--success-bg); border-color: var(--success); }
-    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(26,79,153,0.3); } 70% { box-shadow: 0 0 0 20px rgba(26,79,153,0); } 100% { box-shadow: 0 0 0 0 rgba(26,79,153,0); } }
-    .scan-title { font-weight: 700; font-size: 1.15rem; margin-bottom: 0.4rem; }
-    .scan-subtitle { color: var(--muted); font-size: 0.875rem; margin-bottom: 1.25rem; }
-    .progress-bar { width: 100%; background: #f3f4f6; border-radius: 999px; height: 8px; overflow: hidden; margin-bottom: 0.5rem; }
-    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--primary-dark)); border-radius: 999px; transition: width 0.1s linear; width: 0%; }
-    .progress-fill.success { background: linear-gradient(90deg, var(--success), #15803d); }
-    .progress-label { font-size: 0.8rem; font-weight: 600; color: var(--primary); margin-bottom: 1.25rem; }
-    .progress-label.success { color: var(--success); }
-    .btn { width: 100%; height: 48px; border: none; border-radius: 12px; font-size: 0.975rem; font-family: 'Inter', sans-serif; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: opacity 0.15s; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; box-shadow: 0 4px 16px rgba(26,79,153,0.25); }
-    .btn:hover:not(:disabled) { opacity: 0.9; }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .success-box { background: var(--success-bg); border: 1px solid var(--success-border); border-radius: 12px; padding: 1rem 1.25rem; display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; font-size: 0.9rem; color: var(--success); font-weight: 600; }
     .voter-info { background: var(--primary-light); border-radius: 10px; padding: 0.75rem 1rem; font-size: 0.875rem; margin-bottom: 1.5rem; }
     .voter-info strong { color: var(--primary); }
-    .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
+    .scan-section { display: flex; flex-direction: column; align-items: center; text-align: center; }
+    /* Camera ring */
+    .camera-ring { position: relative; width: 180px; height: 180px; border-radius: 50%; overflow: hidden; border: 3px solid var(--border); margin-bottom: 1.25rem; background: #111; transition: border-color 0.3s; flex-shrink: 0; }
+    .camera-ring.detecting { border-color: var(--primary); box-shadow: 0 0 0 0 rgba(26,79,153,0.3); animation: pulse-ring 1.4s infinite; }
+    .camera-ring.matched { border-color: var(--success); box-shadow: 0 0 0 4px rgba(22,163,74,0.15); animation: none; }
+    .camera-ring.failed { border-color: var(--error); animation: none; }
+    @keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(26,79,153,0.3); } 70% { box-shadow: 0 0 0 16px rgba(26,79,153,0); } 100% { box-shadow: 0 0 0 0 rgba(26,79,153,0); } }
+    .camera-ring video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); display: block; }
+    .camera-ring .cam-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 3rem; background: var(--primary-light); }
+    .cam-status-bar { position: absolute; bottom: 0; left: 0; right: 0; padding: 0.25rem 0.5rem; background: rgba(0,0,0,0.55); font-size: 0.65rem; font-weight: 600; color: #fff; text-align: center; }
+    .scan-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 0.3rem; }
+    .scan-subtitle { color: var(--muted); font-size: 0.85rem; margin-bottom: 1rem; max-width: 280px; line-height: 1.5; }
+    .progress-bar { width: 100%; background: #f3f4f6; border-radius: 999px; height: 8px; overflow: hidden; margin-bottom: 0.4rem; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--primary-dark)); border-radius: 999px; transition: width 0.15s linear; width: 0%; }
+    .progress-fill.success { background: linear-gradient(90deg, var(--success), #15803d); }
+    .progress-fill.error { background: linear-gradient(90deg, var(--error), #b91c1c); }
+    .progress-label { font-size: 0.78rem; font-weight: 600; color: var(--muted); margin-bottom: 1.25rem; }
+    .progress-label.success { color: var(--success); }
+    .progress-label.error { color: var(--error); }
+    .btn { width: 100%; height: 48px; border: none; border-radius: 12px; font-size: 0.975rem; font-family: 'Inter', sans-serif; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: opacity 0.15s; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; box-shadow: 0 4px 16px rgba(26,79,153,0.25); }
+    .btn:hover:not(:disabled) { opacity: 0.9; }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn.success-btn { background: linear-gradient(135deg, var(--success), #15803d); box-shadow: 0 4px 16px rgba(22,163,74,0.25); }
+    .success-box { background: var(--success-bg); border: 1px solid var(--success-border); border-radius: 12px; padding: 1rem 1.25rem; display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; font-size: 0.9rem; color: var(--success); font-weight: 600; }
+    .error-box { background: var(--error-bg); border: 1px solid #fecaca; border-radius: 12px; padding: 1rem 1.25rem; display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; font-size: 0.875rem; color: var(--error); font-weight: 600; }
+    .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; flex-shrink: 0; }
     @keyframes spin { to { transform: rotate(360deg); } }
     .section { display: none; }
     .section.active { display: block; }
+    /* Fingerprint ring (simulated) */
+    .fp-ring { width: 140px; height: 140px; border-radius: 50%; background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 3rem; border: 3px solid var(--primary-light); transition: all 0.3s; margin-bottom: 1.25rem; }
+    .fp-ring.scanning { border-color: var(--primary); animation: pulse-ring 1.4s infinite; }
+    .fp-ring.done { background: var(--success-bg); border-color: var(--success); animation: none; }
+    /* Permission denied state */
+    .cam-denied { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 1.5rem; }
+    .cam-denied .icon { font-size: 3rem; margin-bottom: 0.75rem; }
+    .cam-denied h3 { font-weight: 700; color: var(--error); margin-bottom: 0.4rem; }
+    .cam-denied p { font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
+    .loading-models { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 1rem 0; color: var(--muted); font-size: 0.85rem; }
+    .spinner-dark { width: 22px; height: 22px; border: 2px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.7s linear infinite; }
   </style>
 </head>
 <body>
@@ -59,16 +80,14 @@
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
       Digital Voting System
     </a>
-    <nav>
-      <a href="/result.html">📊 Results</a>
-    </nav>
+    <nav><a href="/result.html">📊 Results</a></nav>
   </header>
 
   <main>
     <div class="container">
       <div class="badge">🔒 Biometric Verification</div>
       <h1>Identity Verification</h1>
-      <p class="subtitle">Complete face and fingerprint scan to proceed to voting.</p>
+      <p class="subtitle">Complete face and fingerprint verification to proceed to voting.</p>
 
       <div class="steps">
         <div class="step"><div class="step-dot done">✓</div><span class="step-label inactive">Aadhar</span></div>
@@ -81,23 +100,34 @@
       <div class="voter-info">Welcome, <strong id="voterName">Voter</strong></div>
 
       <div class="card">
-        <!-- STEP 1: Face Scan -->
+
+        <!-- ── STEP 1: Face Scan ── -->
         <div id="faceSection" class="section active">
           <div class="scan-section">
-            <div class="scan-ring-inner" id="faceRing">📷</div>
-            <div class="scan-title">Face Verification</div>
-            <div class="scan-subtitle" id="faceSubtitle">Position your face in front of the camera and click Scan</div>
+            <div class="camera-ring" id="cameraRing">
+              <div class="cam-placeholder" id="camPlaceholder">📷</div>
+              <video id="cameraFeed" autoplay muted playsinline style="display:none"></video>
+              <div class="cam-status-bar" id="camStatusBar" style="display:none"></div>
+            </div>
+
+            <div id="modelsLoading" class="loading-models" style="display:none">
+              <div class="spinner-dark"></div>
+              <span>Loading face recognition AI...</span>
+            </div>
+
+            <div class="scan-title" id="faceTitle">Face Verification</div>
+            <div class="scan-subtitle" id="faceSubtitle">Activating camera...</div>
             <div class="progress-bar"><div class="progress-fill" id="faceProgress"></div></div>
-            <div class="progress-label" id="faceLabel">Ready to scan</div>
-            <button class="btn" id="faceScanBtn" onclick="startFaceScan()">📷 &nbsp;Start Face Scan</button>
+            <div class="progress-label" id="faceLabel">Please wait</div>
+            <button class="btn" id="faceScanBtn" disabled onclick="startFaceScan()">📷 &nbsp;Start Face Scan</button>
           </div>
         </div>
 
-        <!-- STEP 2: Fingerprint -->
+        <!-- ── STEP 2: Fingerprint (simulated) ── -->
         <div id="fpSection" class="section">
-          <div class="success-box">✅ Face verification complete!</div>
+          <div class="success-box">✅ Face verified successfully!</div>
           <div class="scan-section">
-            <div class="scan-ring-inner" id="fpRing">👆</div>
+            <div class="fp-ring" id="fpRing">👆</div>
             <div class="scan-title">Fingerprint Verification</div>
             <div class="scan-subtitle" id="fpSubtitle">Place your finger on the scanner and click Scan</div>
             <div class="progress-bar"><div class="progress-fill" id="fpProgress"></div></div>
@@ -106,20 +136,27 @@
           </div>
         </div>
 
-        <!-- STEP 3: Done -->
+        <!-- ── STEP 3: Done ── -->
         <div id="doneSection" class="section">
           <div class="scan-section">
-            <div class="scan-ring-inner done">✅</div>
+            <div class="fp-ring done">✅</div>
             <div class="scan-title" style="color:var(--success)">Verification Complete!</div>
             <div class="scan-subtitle">Both face and fingerprint verified. Redirecting to voting...</div>
           </div>
         </div>
+
       </div>
     </div>
   </main>
 
   <script>
-    // Check session on load
+    const MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights';
+    let cameraStream = null;
+    let detectionTimer = null;
+    let modelsReady = false;
+    let faceDetected = false;
+
+    // ── Auth check ──
     (async () => {
       try {
         const res = await fetch('/api/auth/me', { credentials: 'include' });
@@ -128,49 +165,176 @@
         document.getElementById('voterName').textContent = data.name;
         if (data.hasVoted) { window.location.replace('/result.html'); return; }
       } catch { window.location.replace('/'); }
-    })();
 
-    // Also try from sessionStorage for instant name display
-    try {
-      const v = JSON.parse(sessionStorage.getItem('voter') || 'null');
-      if (v && v.name) document.getElementById('voterName').textContent = v.name;
-    } catch {}
+      // Start camera after auth confirmed
+      initCamera();
+    })();
 
     function show(id) {
       document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
       document.getElementById(id).classList.add('active');
     }
 
-    function startFaceScan() {
+    // ── Camera + model init ──
+    async function initCamera() {
+      const video = document.getElementById('cameraFeed');
+      const placeholder = document.getElementById('camPlaceholder');
+      const statusBar = document.getElementById('camStatusBar');
+      const modelsLoading = document.getElementById('modelsLoading');
+      const ring = document.getElementById('cameraRing');
+
+      try {
+        cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: 640, height: 480 } });
+        video.srcObject = cameraStream;
+        placeholder.style.display = 'none';
+        video.style.display = 'block';
+        statusBar.style.display = 'block';
+        statusBar.textContent = 'Camera active';
+
+        document.getElementById('faceSubtitle').textContent = 'Loading face recognition AI...';
+        modelsLoading.style.display = 'flex';
+
+        // Load models
+        await Promise.all([
+          faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+          faceapi.nets.faceLandmark68TinyNet.loadFromUri(MODEL_URL),
+          faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
+        ]);
+
+        modelsReady = true;
+        modelsLoading.style.display = 'none';
+        document.getElementById('faceSubtitle').textContent = 'Position your face clearly in the frame';
+        document.getElementById('faceLabel').textContent = 'Looking for face...';
+        document.getElementById('faceScanBtn').disabled = false;
+        ring.classList.add('detecting');
+
+        // Face detection loop
+        detectionTimer = setInterval(async () => {
+          if (!modelsReady) return;
+          try {
+            const det = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ scoreThreshold: 0.4 }));
+            if (det) {
+              faceDetected = true;
+              statusBar.textContent = '✓ Face detected';
+              statusBar.style.background = 'rgba(22,163,74,0.75)';
+              document.getElementById('faceLabel').textContent = 'Face detected — ready to scan!';
+            } else {
+              faceDetected = false;
+              statusBar.textContent = 'No face found — adjust position';
+              statusBar.style.background = 'rgba(0,0,0,0.55)';
+              document.getElementById('faceLabel').textContent = 'Looking for face...';
+            }
+          } catch {}
+        }, 400);
+
+      } catch (err) {
+        // Camera permission denied
+        document.getElementById('faceSection').innerHTML = `
+          <div class="cam-denied">
+            <div class="icon">🚫</div>
+            <h3>Camera Access Denied</h3>
+            <p>Please allow camera access in your browser and refresh the page to complete biometric verification.</p>
+          </div>
+        `;
+      }
+    }
+
+    // ── Face scan ──
+    async function startFaceScan() {
+      const video = document.getElementById('cameraFeed');
       const btn = document.getElementById('faceScanBtn');
-      const ring = document.getElementById('faceRing');
       const fill = document.getElementById('faceProgress');
       const label = document.getElementById('faceLabel');
       const sub = document.getElementById('faceSubtitle');
+      const ring = document.getElementById('cameraRing');
 
       btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span>&nbsp; Scanning face...';
-      ring.classList.add('scanning');
-      sub.textContent = 'Scanning your face...';
+      btn.innerHTML = '<span class="spinner"></span>&nbsp; Analyzing face...';
+      sub.textContent = 'Capturing and analyzing your face...';
 
+      // Animate progress
       let pct = 0;
-      const iv = setInterval(() => {
-        pct = Math.min(pct + 4, 100);
+      const progressIv = setInterval(() => {
+        pct = Math.min(pct + 2, 85);
         fill.style.width = pct + '%';
-        label.textContent = pct < 100 ? `Scanning... ${pct}%` : '✅ Face verified!';
-        if (pct >= 100) {
-          clearInterval(iv);
-          fill.classList.add('success');
-          label.classList.add('success');
-          ring.classList.remove('scanning');
-          ring.classList.add('done');
-          ring.textContent = '✅';
-          sub.textContent = 'Face scan complete.';
-          setTimeout(() => show('fpSection'), 800);
+        label.textContent = `Analyzing... ${pct}%`;
+      }, 80);
+
+      try {
+        const detection = await faceapi
+          .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ scoreThreshold: 0.35 }))
+          .withFaceLandmarks(true)
+          .withFaceDescriptor();
+
+        clearInterval(progressIv);
+
+        if (!detection) {
+          fill.style.width = '0%';
+          fill.classList.remove('success');
+          label.textContent = 'No face detected — please try again';
+          label.classList.remove('success');
+          sub.textContent = 'Make sure your face is clearly lit and visible in the frame.';
+          ring.classList.remove('matched', 'failed');
+          ring.classList.add('detecting');
+          btn.disabled = false;
+          btn.innerHTML = '📷 Try Again';
+          return;
         }
-      }, 70);
+
+        const descriptor = Array.from(detection.descriptor);
+
+        const res = await fetch('/api/auth/verify-face', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ descriptor }),
+        });
+        const data = await res.json();
+
+        fill.style.width = '100%';
+
+        if (data.match) {
+          fill.classList.add('success');
+          ring.classList.remove('detecting', 'failed');
+          ring.classList.add('matched');
+          label.textContent = data.skipped ? '✅ Proceeding (no biometric data on file)' : '✅ Face matched!';
+          label.classList.add('success');
+          sub.textContent = data.skipped
+            ? 'No face data was registered for your account.'
+            : `Identity confirmed (confidence: ${Math.round((1 - data.distance) * 100)}%)`;
+
+          clearInterval(detectionTimer);
+          if (cameraStream) cameraStream.getTracks().forEach(t => t.stop());
+
+          setTimeout(() => show('fpSection'), 1000);
+        } else {
+          fill.classList.add('error');
+          ring.classList.remove('detecting', 'matched');
+          ring.classList.add('failed');
+          label.textContent = '❌ Face not recognized';
+          label.classList.add('error');
+          sub.textContent = 'Your face does not match the registered data. Please contact admin if this is an error.';
+          btn.innerHTML = '📷 Try Again';
+          btn.disabled = false;
+          setTimeout(() => {
+            fill.style.width = '0%';
+            fill.classList.remove('error');
+            label.classList.remove('error');
+            ring.classList.remove('failed');
+            ring.classList.add('detecting');
+          }, 3000);
+        }
+
+      } catch (err) {
+        clearInterval(progressIv);
+        fill.style.width = '0%';
+        label.textContent = 'Error — please try again';
+        btn.disabled = false;
+        btn.innerHTML = '📷 Try Again';
+      }
     }
 
+    // ── Fingerprint scan (simulated) ──
     function startFpScan() {
       const btn = document.getElementById('fpScanBtn');
       const ring = document.getElementById('fpRing');

@@ -6,6 +6,7 @@
   <title>Admin Panel – Digital Voting System</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
+  <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --primary: #1a4f99; --primary-dark: #0f3b75; --primary-light: #e8f0fc; --text: #1a1a2e; --muted: #6b7280; --border: #e5e7eb; --bg: #f8fafc; --card: #ffffff; --success: #16a34a; --success-bg: #f0fdf4; --error: #dc2626; --error-bg: #fef2f2; --error-border: #fecaca; }
@@ -15,41 +16,73 @@
     nav a { font-size: 0.875rem; color: var(--muted); text-decoration: none; padding: 0.4rem 0.8rem; border-radius: 6px; }
     nav a:hover { background: var(--primary-light); color: var(--primary); }
     main { flex: 1; padding: 2rem 1rem; }
-    .container { max-width: 900px; margin: 0 auto; }
+    .container { max-width: 960px; margin: 0 auto; }
     h1 { font-family: 'Libre Baskerville', serif; font-size: 1.9rem; font-weight: 700; margin-bottom: 0.35rem; }
     .subtitle { color: var(--muted); font-size: 0.95rem; margin-bottom: 2rem; }
     .badge { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.8rem; border-radius: 999px; background: var(--primary-light); color: var(--primary); font-size: 0.78rem; font-weight: 600; margin-bottom: 1rem; }
-    .login-panel { max-width: 400px; margin: 0 auto; }
+    .login-panel { max-width: 420px; margin: 0 auto; }
     .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.75rem; box-shadow: 0 4px 24px rgba(26,79,153,0.06); }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-    @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
-    .section-title { font-family: 'Libre Baskerville', serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; }
-    .field { margin-bottom: 1rem; }
-    label { display: block; font-weight: 600; font-size: 0.83rem; margin-bottom: 0.35rem; }
-    input[type="text"] { width: 100%; height: 42px; padding: 0 0.875rem; border: 1px solid var(--border); border-radius: 10px; font-size: 0.9rem; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); outline: none; transition: border-color 0.15s; }
+    @media (max-width: 680px) { .grid-2 { grid-template-columns: 1fr; } }
+    .section-title { font-family: 'Libre Baskerville', serif; font-size: 1.05rem; font-weight: 700; margin-bottom: 1rem; }
+    .field { margin-bottom: 0.875rem; }
+    label { display: block; font-weight: 600; font-size: 0.82rem; margin-bottom: 0.3rem; }
+    input[type="text"] { width: 100%; height: 40px; padding: 0 0.875rem; border: 1px solid var(--border); border-radius: 10px; font-size: 0.9rem; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); outline: none; }
     input[type="text"]:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(26,79,153,0.1); }
-    .btn { height: 42px; padding: 0 1.25rem; border: none; border-radius: 10px; font-size: 0.9rem; font-family: 'Inter', sans-serif; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; }
+    .btn { height: 40px; padding: 0 1.1rem; border: none; border-radius: 10px; font-size: 0.875rem; font-family: 'Inter', sans-serif; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; }
     .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; width: 100%; }
     .btn-primary:hover { opacity: 0.9; }
-    .btn-danger { background: var(--error-bg); border: 1px solid var(--error-border); color: var(--error); padding: 0.25rem 0.6rem; height: 30px; font-size: 0.78rem; border-radius: 6px; cursor: pointer; font-family: 'Inter', sans-serif; font-weight: 600; }
+    .btn-danger { background: var(--error-bg); border: 1px solid var(--error-border); color: var(--error); padding: 0.2rem 0.55rem; height: 28px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; font-family: 'Inter', sans-serif; font-weight: 600; }
     .btn-danger:hover { background: #fee2e2; }
-    .list-wrap { margin-top: 1.25rem; }
-    .list-empty { text-align: center; color: var(--muted); font-size: 0.875rem; padding: 1.25rem 0; }
-    .item-row { display: flex; align-items: center; justify-content: space-between; padding: 0.7rem 0.875rem; border-radius: 10px; background: var(--bg); border: 1px solid var(--border); margin-bottom: 0.5rem; }
-    .item-name { font-weight: 600; font-size: 0.9rem; }
-    .item-meta { font-size: 0.78rem; color: var(--muted); margin-top: 0.1rem; }
-    .badge-voted { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 999px; font-size: 0.7rem; font-weight: 700; background: #f0fdf4; color: var(--success); margin-left: 0.4rem; }
+    .list-wrap { margin-top: 1.1rem; }
+    .list-empty { text-align: center; color: var(--muted); font-size: 0.875rem; padding: 1rem 0; }
+    .item-row { display: flex; align-items: center; justify-content: space-between; padding: 0.65rem 0.875rem; border-radius: 10px; background: var(--bg); border: 1px solid var(--border); margin-bottom: 0.45rem; gap: 0.5rem; }
+    .item-name { font-weight: 600; font-size: 0.88rem; }
+    .item-meta { font-size: 0.75rem; color: var(--muted); margin-top: 0.1rem; }
+    .badge-voted { display: inline-block; padding: 0.12rem 0.45rem; border-radius: 999px; font-size: 0.68rem; font-weight: 700; background: #f0fdf4; color: var(--success); margin-left: 0.35rem; }
+    .badge-face { display: inline-block; padding: 0.12rem 0.45rem; border-radius: 999px; font-size: 0.68rem; font-weight: 700; background: var(--primary-light); color: var(--primary); margin-left: 0.35rem; }
     .toast { position: fixed; bottom: 1.5rem; right: 1.5rem; padding: 0.75rem 1.25rem; border-radius: 12px; font-size: 0.875rem; font-weight: 600; z-index: 200; transform: translateY(100px); opacity: 0; transition: transform 0.3s, opacity 0.3s; }
     .toast.show { transform: translateY(0); opacity: 1; }
     .toast.success { background: var(--success); color: #fff; }
     .toast.error { background: var(--error); color: #fff; }
-    .error-box { background: var(--error-bg); border: 1px solid var(--error-border); border-radius: 10px; padding: 0.7rem 1rem; font-size: 0.85rem; color: var(--error); margin-bottom: 1rem; display: none; }
+    .error-box { background: var(--error-bg); border: 1px solid var(--error-border); border-radius: 10px; padding: 0.65rem 1rem; font-size: 0.83rem; color: var(--error); margin-bottom: 0.875rem; display: none; }
     .error-box.show { display: block; }
     .logout-btn { font-size: 0.8rem; color: var(--muted); background: none; border: 1px solid var(--border); border-radius: 6px; padding: 0.3rem 0.7rem; cursor: pointer; font-family: 'Inter', sans-serif; }
     .header-row { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.5rem; gap: 1rem; }
-    .spinner-sm { width: 15px; height: 15px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
-    .spinner { width: 36px; height: 36px; border: 3px solid var(--primary-light); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 3rem auto; display: block; }
+    .spinner-sm { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
+    .spinner { width: 34px; height: 34px; border: 3px solid var(--primary-light); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 3rem auto; display: block; }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Face capture area ── */
+    .face-capture-area { margin-bottom: 0.875rem; }
+    .face-capture-label { font-weight: 600; font-size: 0.82rem; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem; }
+    .face-capture-label .optional { font-weight: 400; color: var(--muted); font-size: 0.75rem; }
+    .face-capture-box { border: 1.5px dashed var(--border); border-radius: 12px; padding: 0.875rem; text-align: center; background: var(--bg); }
+    .face-capture-box.has-face { border-color: var(--success); background: var(--success-bg); }
+    .face-thumb { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; border: 2px solid var(--success); margin-bottom: 0.5rem; display: block; margin-left: auto; margin-right: auto; }
+    .btn-cam { height: 34px; padding: 0 0.875rem; border: 1px solid var(--border); border-radius: 8px; font-size: 0.82rem; font-family: 'Inter', sans-serif; font-weight: 600; cursor: pointer; background: var(--card); color: var(--text); display: inline-flex; align-items: center; gap: 0.35rem; }
+    .btn-cam:hover { background: var(--primary-light); border-color: var(--primary); color: var(--primary); }
+    .btn-cam-danger { border-color: var(--error-border); color: var(--error); background: var(--error-bg); }
+    .btn-cam-danger:hover { background: #fee2e2; }
+    .face-status-text { font-size: 0.78rem; color: var(--success); font-weight: 600; }
+
+    /* ── Camera modal ── */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); display: none; align-items: center; justify-content: center; z-index: 100; padding: 1rem; }
+    .modal-overlay.show { display: flex; }
+    .cam-modal { background: var(--card); border-radius: 20px; padding: 1.5rem; max-width: 420px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.25); }
+    .cam-modal h3 { font-family: 'Libre Baskerville', serif; font-size: 1.2rem; margin-bottom: 0.35rem; }
+    .cam-modal p { font-size: 0.83rem; color: var(--muted); margin-bottom: 1rem; }
+    .cam-video-wrap { position: relative; width: 100%; aspect-ratio: 4/3; border-radius: 12px; overflow: hidden; background: #111; margin-bottom: 1rem; }
+    .cam-video-wrap video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); display: block; }
+    .cam-face-badge { position: absolute; top: 0.5rem; right: 0.5rem; padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.7rem; font-weight: 700; }
+    .cam-face-badge.found { background: rgba(22,163,74,0.85); color: #fff; }
+    .cam-face-badge.searching { background: rgba(0,0,0,0.55); color: #fff; }
+    .modal-btns { display: flex; gap: 0.75rem; }
+    .btn-modal-cancel { flex: 1; height: 42px; border: 2px solid var(--border); border-radius: 10px; background: transparent; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.9rem; cursor: pointer; }
+    .btn-modal-capture { flex: 2; height: 42px; border: none; border-radius: 10px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.4rem; }
+    .btn-modal-capture:disabled { opacity: 0.5; cursor: not-allowed; }
+    .cam-hint { font-size: 0.75rem; color: var(--muted); text-align: center; margin-bottom: 0.75rem; }
+    .spinner-blue { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
   </style>
 </head>
 <body>
@@ -63,20 +96,48 @@
       <a href="/result.html">📊 Results</a>
     </nav>
   </header>
+
   <main>
     <div class="container">
       <div id="content"><div class="spinner"></div></div>
     </div>
   </main>
+
   <div class="toast" id="toast"></div>
 
+  <!-- Camera capture modal -->
+  <div class="modal-overlay" id="camModal">
+    <div class="cam-modal">
+      <h3>📷 Capture Face</h3>
+      <p>Position the voter's face clearly in the frame, then click Capture.</p>
+      <div class="cam-video-wrap">
+        <video id="modalVideo" autoplay muted playsinline></video>
+        <div class="cam-face-badge searching" id="camFaceBadge">Searching...</div>
+      </div>
+      <div class="cam-hint" id="camHint">Loading face recognition AI...</div>
+      <div class="modal-btns">
+        <button class="btn-modal-cancel" onclick="closeCamModal()">Cancel</button>
+        <button class="btn-modal-capture" id="captureBtn" disabled onclick="captureFrame()">📸 Capture Face</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden canvas for capturing frames -->
+  <canvas id="captureCanvas" style="display:none"></canvas>
+
   <script>
+    const MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights';
     let currentAdmin = null;
+    let capturedFaceDescriptor = null; // 128-float array
+    let capturedFaceThumb = null;      // base64 thumbnail
+    let modalStream = null;
+    let modalDetectionTimer = null;
+    let modelsLoaded = false;
 
     function toast(msg, type = 'success') {
       const t = document.getElementById('toast');
       t.textContent = msg; t.className = `toast ${type} show`;
-      setTimeout(() => t.classList.remove('show'), 3000);
+      setTimeout(() => t.classList.remove('show'), 3500);
     }
 
     async function init() {
@@ -95,9 +156,12 @@
         <div class="login-panel">
           <div class="badge">⚙️ Admin Access</div>
           <h1>Admin Login</h1>
-          <p class="subtitle">Login with your admin Aadhar number to manage the election system.</p>
+          <p class="subtitle">Login with your admin Aadhar number to manage the system.</p>
           <div class="card">
-            <div class="field"><label>Admin Aadhar Number</label><input type="text" id="adminAadhar" inputmode="numeric" maxlength="12" placeholder="12-digit Aadhar number" autocomplete="off" /></div>
+            <div class="field">
+              <label>Admin Aadhar Number</label>
+              <input type="text" id="adminAadhar" inputmode="numeric" maxlength="12" placeholder="12-digit Aadhar number" autocomplete="off" />
+            </div>
             <div class="error-box" id="loginErr"></div>
             <button class="btn btn-primary" id="loginBtn" onclick="adminLogin()">Login as Admin</button>
           </div>
@@ -112,7 +176,10 @@
       const btn = document.getElementById('loginBtn');
       btn.disabled = true; btn.innerHTML = '<span class="spinner-sm"></span>&nbsp; Logging in...';
       try {
-        const res = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ aadharNumber: aadhar, isAdmin: true }) });
+        const res = await fetch('/api/auth/login', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          credentials: 'include', body: JSON.stringify({ aadharNumber: aadhar, isAdmin: true })
+        });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Login failed');
         if (!data.voter.isAdmin) throw new Error('This account does not have admin privileges');
@@ -123,6 +190,10 @@
     function showErr(id, msg) { const el = document.getElementById(id); el.textContent = msg; el.classList.add('show'); }
 
     async function renderAdmin() {
+      // Reset face capture state
+      capturedFaceDescriptor = null;
+      capturedFaceThumb = null;
+
       const [vRes, cRes] = await Promise.all([
         fetch('/api/admin/voters', { credentials: 'include' }),
         fetch('/api/admin/candidates', { credentials: 'include' }),
@@ -140,24 +211,60 @@
           </div>
           <button class="logout-btn" onclick="logout()">Logout</button>
         </div>
+
         <div class="grid-2">
+          <!-- Voters column -->
           <div class="card">
             <div class="section-title">👤 Voters (${normalVoters.length})</div>
-            <div class="field"><label>Full Name</label><input type="text" id="vName" placeholder="e.g. Ramesh Kumar" /></div>
-            <div class="field"><label>Aadhar Number</label><input type="text" id="vAadhar" inputmode="numeric" maxlength="12" placeholder="12-digit Aadhar" /></div>
+
+            <div class="field">
+              <label>Full Name</label>
+              <input type="text" id="vName" placeholder="e.g. Ramesh Kumar" />
+            </div>
+            <div class="field">
+              <label>Aadhar Number</label>
+              <input type="text" id="vAadhar" inputmode="numeric" maxlength="12" placeholder="12-digit Aadhar" />
+            </div>
+
+            <!-- Face capture -->
+            <div class="face-capture-area">
+              <div class="face-capture-label">
+                Face Biometric <span class="optional">(recommended)</span>
+              </div>
+              <div class="face-capture-box" id="faceCaptureBox">
+                <div id="faceNotCaptured">
+                  <div style="font-size:1.75rem;margin-bottom:0.4rem">📷</div>
+                  <div style="font-size:0.8rem;color:var(--muted);margin-bottom:0.6rem">No face data — voter will skip face verification</div>
+                  <button class="btn-cam" onclick="openCamModal()">📷 &nbsp;Open Camera &amp; Capture Face</button>
+                </div>
+                <div id="faceCaptured" style="display:none">
+                  <img id="faceThumb" class="face-thumb" src="" alt="Captured face" />
+                  <div class="face-status-text" style="margin-bottom:0.5rem">✅ Face captured successfully</div>
+                  <button class="btn-cam btn-cam-danger" onclick="clearFace()">🗑 Remove &amp; Retake</button>
+                </div>
+              </div>
+            </div>
+
             <button class="btn btn-primary" onclick="addVoter()">+ Add Voter</button>
+
             <div class="list-wrap">
               ${normalVoters.length === 0 ? '<div class="list-empty">No voters registered</div>' :
                 normalVoters.map(v => `
                   <div class="item-row">
-                    <div>
-                      <div class="item-name">${v.name}${v.hasVoted ? '<span class="badge-voted">Voted</span>' : ''}</div>
+                    <div style="min-width:0">
+                      <div class="item-name">
+                        ${v.name}
+                        ${v.hasVoted ? '<span class="badge-voted">Voted</span>' : ''}
+                        ${v.hasFaceData ? '<span class="badge-face">📷 Face</span>' : ''}
+                      </div>
                       <div class="item-meta">••••${v.aadharNumber.slice(-4)}</div>
                     </div>
                     <button class="btn-danger" onclick="removeVoter(${v.id},'${v.name.replace(/'/g,"\\'")}')">Remove</button>
                   </div>`).join('')}
             </div>
           </div>
+
+          <!-- Candidates column -->
           <div class="card">
             <div class="section-title">🗳️ Candidates (${candidates.length})</div>
             <div class="field"><label>Name</label><input type="text" id="cName" placeholder="e.g. Amit Singh" /></div>
@@ -180,15 +287,135 @@
       `;
     }
 
+    // ── Face capture modal ──
+    async function openCamModal() {
+      document.getElementById('camModal').classList.add('show');
+      document.getElementById('camHint').textContent = 'Activating camera...';
+      document.getElementById('captureBtn').disabled = true;
+      document.getElementById('camFaceBadge').textContent = 'Searching...';
+      document.getElementById('camFaceBadge').className = 'cam-face-badge searching';
+
+      try {
+        modalStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: 640, height: 480 } });
+        document.getElementById('modalVideo').srcObject = modalStream;
+
+        // Load models if not already loaded
+        if (!modelsLoaded) {
+          document.getElementById('camHint').textContent = 'Loading face recognition AI (first time may take 10–15 seconds)...';
+          await Promise.all([
+            faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+            faceapi.nets.faceLandmark68TinyNet.loadFromUri(MODEL_URL),
+            faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
+          ]);
+          modelsLoaded = true;
+        }
+
+        document.getElementById('camHint').textContent = 'Position face clearly in frame, then click Capture.';
+        document.getElementById('captureBtn').disabled = false;
+
+        // Detection loop
+        const video = document.getElementById('modalVideo');
+        modalDetectionTimer = setInterval(async () => {
+          try {
+            const det = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ scoreThreshold: 0.4 }));
+            const badge = document.getElementById('camFaceBadge');
+            if (det) {
+              badge.textContent = '✓ Face detected';
+              badge.className = 'cam-face-badge found';
+            } else {
+              badge.textContent = 'No face found';
+              badge.className = 'cam-face-badge searching';
+            }
+          } catch {}
+        }, 400);
+
+      } catch (err) {
+        document.getElementById('camHint').textContent = '⚠️ Camera access denied. Please allow camera in browser settings.';
+        document.getElementById('captureBtn').disabled = true;
+      }
+    }
+
+    function closeCamModal() {
+      clearInterval(modalDetectionTimer);
+      if (modalStream) modalStream.getTracks().forEach(t => t.stop());
+      modalStream = null;
+      document.getElementById('camModal').classList.remove('show');
+    }
+
+    async function captureFrame() {
+      const video = document.getElementById('modalVideo');
+      const btn = document.getElementById('captureBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-blue"></span>&nbsp; Capturing...';
+      document.getElementById('camHint').textContent = 'Extracting face encoding...';
+
+      try {
+        const detection = await faceapi
+          .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ scoreThreshold: 0.35 }))
+          .withFaceLandmarks(true)
+          .withFaceDescriptor();
+
+        if (!detection) {
+          document.getElementById('camHint').textContent = '⚠️ No face detected. Adjust position and try again.';
+          btn.disabled = false;
+          btn.innerHTML = '📸 Capture Face';
+          return;
+        }
+
+        // Save descriptor
+        capturedFaceDescriptor = JSON.stringify(Array.from(detection.descriptor));
+
+        // Capture thumbnail from video
+        const canvas = document.getElementById('captureCanvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.translate(canvas.width, 0);
+        ctx.scale(-1, 1);
+        ctx.drawImage(video, 0, 0);
+        capturedFaceThumb = canvas.toDataURL('image/jpeg', 0.7);
+
+        closeCamModal();
+
+        // Show thumbnail in form
+        document.getElementById('faceNotCaptured').style.display = 'none';
+        document.getElementById('faceCaptured').style.display = 'block';
+        document.getElementById('faceThumb').src = capturedFaceThumb;
+        document.getElementById('faceCaptureBox').classList.add('has-face');
+
+        toast('✅ Face captured and encoded successfully');
+      } catch (err) {
+        document.getElementById('camHint').textContent = 'Error capturing face. Please try again.';
+        btn.disabled = false;
+        btn.innerHTML = '📸 Capture Face';
+      }
+    }
+
+    function clearFace() {
+      capturedFaceDescriptor = null;
+      capturedFaceThumb = null;
+      document.getElementById('faceCaptured').style.display = 'none';
+      document.getElementById('faceNotCaptured').style.display = 'block';
+      document.getElementById('faceCaptureBox').classList.remove('has-face');
+    }
+
+    // ── Voter management ──
     async function addVoter() {
       const name = document.getElementById('vName').value.trim();
       const aadhar = document.getElementById('vAadhar').value.trim();
       if (!name || aadhar.length !== 12) { toast('Enter valid name and 12-digit Aadhar', 'error'); return; }
       try {
-        const res = await fetch('/api/admin/voters', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ name, aadharNumber: aadhar }) });
+        const body = { name, aadharNumber: aadhar };
+        if (capturedFaceDescriptor) body.faceDescriptor = capturedFaceDescriptor;
+
+        const res = await fetch('/api/admin/voters', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          credentials: 'include', body: JSON.stringify(body)
+        });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Failed');
-        toast(`✅ ${name} added`); renderAdmin();
+        toast(`✅ ${name} added${capturedFaceDescriptor ? ' with face biometric' : ' (no face data)'}`);
+        renderAdmin();
       } catch (err) { toast(err.message, 'error'); }
     }
 
@@ -207,7 +434,10 @@
       const symbol = document.getElementById('cSymbol').value.trim();
       if (!name || !party || !symbol) { toast('Fill in all candidate fields', 'error'); return; }
       try {
-        const res = await fetch('/api/admin/candidates', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ name, party, symbol }) });
+        const res = await fetch('/api/admin/candidates', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          credentials: 'include', body: JSON.stringify({ name, party, symbol })
+        });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Failed');
         toast(`✅ ${name} added`); renderAdmin();

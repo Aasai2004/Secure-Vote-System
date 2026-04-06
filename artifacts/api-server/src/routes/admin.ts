@@ -30,6 +30,7 @@ router.get("/voters", async (req, res) => {
     aadharNumber: v.aadharNumber,
     hasVoted: v.hasVoted,
     isAdmin: v.isAdmin,
+    hasFaceData: !!v.faceDescriptor,
     createdAt: v.createdAt.toISOString(),
   })));
 });
@@ -43,7 +44,7 @@ router.post("/voters", async (req, res) => {
     return;
   }
 
-  const { name, aadharNumber, isAdmin } = parsed.data;
+  const { name, aadharNumber, isAdmin, faceDescriptor } = parsed.data;
 
   const existing = await db.query.votersTable.findFirst({
     where: eq(votersTable.aadharNumber, aadharNumber),
@@ -58,6 +59,7 @@ router.post("/voters", async (req, res) => {
     name,
     aadharNumber,
     isAdmin: isAdmin ?? false,
+    faceDescriptor: faceDescriptor ?? null,
   }).returning();
 
   res.status(201).json({

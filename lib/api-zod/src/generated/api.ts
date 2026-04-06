@@ -73,6 +73,7 @@ export const AddVoterBody = zod.object({
   name: zod.string(),
   aadharNumber: zod.string(),
   isAdmin: zod.boolean().optional(),
+  faceDescriptor: zod.string().optional(),
 });
 
 /**
