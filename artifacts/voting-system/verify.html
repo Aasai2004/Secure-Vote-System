@@ -61,10 +61,6 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     .section { display: none; }
     .section.active { display: block; }
-    /* Fingerprint ring (simulated) */
-    .fp-ring { width: 140px; height: 140px; border-radius: 50%; background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 3rem; border: 3px solid var(--primary-light); transition: all 0.3s; margin-bottom: 1.25rem; }
-    .fp-ring.scanning { border-color: var(--primary); animation: pulse-ring 1.4s infinite; }
-    .fp-ring.done { background: var(--success-bg); border-color: var(--success); animation: none; }
     /* Permission denied state */
     .cam-denied { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 1.5rem; }
     .cam-denied .icon { font-size: 3rem; margin-bottom: 0.75rem; }
@@ -87,12 +83,12 @@
     <div class="container">
       <div class="badge">🔒 Biometric Verification</div>
       <h1>Identity Verification</h1>
-      <p class="subtitle">Complete face and fingerprint verification to proceed to voting.</p>
+      <p class="subtitle">Complete face verification to proceed to voting.</p>
 
       <div class="steps">
         <div class="step"><div class="step-dot done">✓</div><span class="step-label inactive">Aadhar</span></div>
         <div class="step-line"></div>
-        <div class="step"><div class="step-dot active">2</div><span class="step-label active">Biometrics</span></div>
+        <div class="step"><div class="step-dot active">2</div><span class="step-label active">Face Scan</span></div>
         <div class="step-line"></div>
         <div class="step"><div class="step-dot inactive">3</div><span class="step-label inactive">Vote</span></div>
       </div>
@@ -123,25 +119,12 @@
           </div>
         </div>
 
-        <!-- ── STEP 2: Fingerprint (simulated) ── -->
-        <div id="fpSection" class="section">
-          <div class="success-box">✅ Face verified successfully!</div>
-          <div class="scan-section">
-            <div class="fp-ring" id="fpRing">👆</div>
-            <div class="scan-title">Fingerprint Verification</div>
-            <div class="scan-subtitle" id="fpSubtitle">Place your finger on the scanner and click Scan</div>
-            <div class="progress-bar"><div class="progress-fill" id="fpProgress"></div></div>
-            <div class="progress-label" id="fpLabel">Ready to scan</div>
-            <button class="btn" id="fpScanBtn" onclick="startFpScan()">👆 &nbsp;Start Fingerprint Scan</button>
-          </div>
-        </div>
-
-        <!-- ── STEP 3: Done ── -->
+        <!-- ── Done ── -->
         <div id="doneSection" class="section">
           <div class="scan-section">
-            <div class="fp-ring done">✅</div>
+            <div style="width:100px;height:100px;border-radius:50%;background:var(--success-bg);border:3px solid var(--success);display:flex;align-items:center;justify-content:center;font-size:2.5rem;margin-bottom:1.25rem">✅</div>
             <div class="scan-title" style="color:var(--success)">Verification Complete!</div>
-            <div class="scan-subtitle">Both face and fingerprint verified. Redirecting to voting...</div>
+            <div class="scan-subtitle">Face verified. Redirecting to voting...</div>
           </div>
         </div>
 
@@ -306,7 +289,10 @@
           clearInterval(detectionTimer);
           if (cameraStream) cameraStream.getTracks().forEach(t => t.stop());
 
-          setTimeout(() => show('fpSection'), 1000);
+          setTimeout(() => {
+            show('doneSection');
+            setTimeout(() => { window.location.href = '/vote.html'; }, 1500);
+          }, 800);
         } else {
           fill.classList.add('error');
           ring.classList.remove('detecting', 'matched');
@@ -334,39 +320,6 @@
       }
     }
 
-    // ── Fingerprint scan (simulated) ──
-    function startFpScan() {
-      const btn = document.getElementById('fpScanBtn');
-      const ring = document.getElementById('fpRing');
-      const fill = document.getElementById('fpProgress');
-      const label = document.getElementById('fpLabel');
-      const sub = document.getElementById('fpSubtitle');
-
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span>&nbsp; Scanning fingerprint...';
-      ring.classList.add('scanning');
-      sub.textContent = 'Reading your fingerprint...';
-
-      let pct = 0;
-      const iv = setInterval(() => {
-        pct = Math.min(pct + 3, 100);
-        fill.style.width = pct + '%';
-        label.textContent = pct < 100 ? `Scanning... ${pct}%` : '✅ Fingerprint verified!';
-        if (pct >= 100) {
-          clearInterval(iv);
-          fill.classList.add('success');
-          label.classList.add('success');
-          ring.classList.remove('scanning');
-          ring.classList.add('done');
-          ring.textContent = '✅';
-          sub.textContent = 'Fingerprint scan complete.';
-          setTimeout(() => {
-            show('doneSection');
-            setTimeout(() => { window.location.href = '/vote.html'; }, 1500);
-          }, 700);
-        }
-      }, 70);
-    }
   </script>
 </body>
 </html>
